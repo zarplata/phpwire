@@ -1,0 +1,29 @@
+{
+  "name": "zp/ioc-container",
+  "description": "Yet another IoC Container",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Vladimir Komissarov",
+      "email": "v.komissarov@zarplata.ru"
+    }
+  ],
+  "require": {
+    "psr/container": "^1.0",
+    "ocramius/proxy-manager": "^1.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^5.7"
+  },
+  "autoload": {
+    "psr-4": {
+      "Zp\\Container\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Zp\\Container\\Tests\\": "tests/src"
+    }
+  }
+}
