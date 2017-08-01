@@ -73,13 +73,13 @@ class Definition
             return;
         }
 
-        $this->className = self::_parseConfig(self::CONFIG_CLASS, $config, $className);
-        $this->arguments = (array)self::_parseConfig(self::CONFIG_ARGS, $config, []);
-        $this->methods = self::_parseMethods($config);
-        $this->isSingleton = (bool)self::_parseConfig(self::CONFIG_SINGLETON, $config, $this->isSingleton);
-        $this->isLazy = (bool)self::_parseConfig(self::CONFIG_LAZY, $config, $this->isLazy);
+        $this->className = self::parseConfig(self::CONFIG_CLASS, $config, $className);
+        $this->arguments = (array)self::parseConfig(self::CONFIG_ARGS, $config, []);
+        $this->methods = self::parseMethods($config);
+        $this->isSingleton = (bool)self::parseConfig(self::CONFIG_SINGLETON, $config, $this->isSingleton);
+        $this->isLazy = (bool)self::parseConfig(self::CONFIG_LAZY, $config, $this->isLazy);
 
-        if ($factoryDefinition = self::_parseConfig(self::CONFIG_FACTORY, $config)) {
+        if ($factoryDefinition = self::parseConfig(self::CONFIG_FACTORY, $config)) {
             $this->isFactory = true;
             $this->factory = $factoryDefinition;
         }
@@ -91,7 +91,7 @@ class Definition
      * @param null $default
      * @return mixed|null
      */
-    private static function _parseConfig($name, array $definition, $default = null)
+    private static function parseConfig($name, array $definition, $default = null)
     {
         return array_key_exists($name, $definition) ? $definition[$name] : $default;
     }
@@ -101,9 +101,9 @@ class Definition
      * @return array
      * @throws ContainerException
      */
-    private static function _parseMethods(array $config)
+    private static function parseMethods(array $config)
     {
-        $methods = self::_parseConfig(self::CONFIG_METHODS, $config, []);
+        $methods = self::parseConfig(self::CONFIG_METHODS, $config, []);
         if (!is_array($methods)) {
             throw new ContainerException('Methods definition should be array');
         }

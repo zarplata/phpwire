@@ -72,9 +72,8 @@ class Container implements ContainerInterface
         try {
             return $this->resolve($this->getDefinition($id));
         } catch (\Exception $e) {
-            throw new ContainerException(
-                sprintf('Unable to create instance of entry `%s`: %s', $id, $e->getMessage()), 0, $e
-            );
+            $message = sprintf('Unable to create instance of entry `%s`: %s', $id, $e->getMessage());
+            throw new ContainerException($message, 0, $e);
         }
     }
 
@@ -145,7 +144,7 @@ class Container implements ContainerInterface
      */
     private function resolve(Definition $definition)
     {
-        if ($this->proxyFactory !== null && $definition->isLazy) {
+        if ($definition->isLazy && $this->proxyFactory !== null) {
             $instance = $this->createProxy($definition);
         } else {
             $instance = $this->createInstance($definition);
@@ -216,7 +215,6 @@ class Container implements ContainerInterface
                     $methodName
                 ));
             }
-
             $method = $reflector->getMethod($methodName);
             $callable(...$this->resolveArguments($methodArgs, $method));
         }
