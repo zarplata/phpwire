@@ -231,6 +231,9 @@ class Container implements ContainerInterface
     private function resolveArguments(array $arguments, \ReflectionMethod $method)
     {
         if ($method->getNumberOfParameters() === 0) {
+            if (count($arguments) > 0) {
+                throw new ContainerException("Method `{$method->name}` have no any arguments");
+            }
             return [];
         }
 
