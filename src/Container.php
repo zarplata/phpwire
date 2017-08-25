@@ -41,6 +41,7 @@ class Container implements ContainerInterface
         $this->singletons = [
             'container' => $this,
             static::class => $this,
+            ContainerInterface::class => $this,
         ];
         $this->definitions = $definitions;
         $this->proxyFactory = $proxyFactory;
