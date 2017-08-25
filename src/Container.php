@@ -4,6 +4,7 @@ namespace Zp\Container;
 
 use ProxyManager\Proxy\LazyLoadingInterface;
 use Psr\Container\ContainerInterface;
+use Zp\Container\Arguments\ArgumentsResolver;
 
 /**
  * IoC container.
@@ -25,7 +26,17 @@ class Container implements ContainerInterface
      */
     private $proxyFactory;
 
-    public function __construct(array $definitions, ProxyFactory $proxyFactory = null)
+    /**
+     * @var string
+     */
+    private $compiledContainerFile;
+
+    /**
+     * @var \Zp\Container\CompiledContainer
+     */
+    private $compiledContainer;
+
+    public function __construct(array $definitions, ProxyFactory $proxyFactory = null, $compiledContainerFile = null)
     {
         $this->singletons = [
             'container' => $this,
@@ -33,6 +44,11 @@ class Container implements ContainerInterface
         ];
         $this->definitions = $definitions;
         $this->proxyFactory = $proxyFactory;
+        $this->compiledContainerFile = $compiledContainerFile;
+
+        if ($compiledContainerFile && file_exists($compiledContainerFile)) {
+            $this->loadCompiledContainer();
+        }
     }
 
     /**
@@ -108,6 +124,7 @@ class Container implements ContainerInterface
 
     /**
      * Generation of proxy classes. Useful for prepare on build.
+     *
      * @throws ContainerException
      */
     public function generateProxies()
@@ -121,8 +138,44 @@ class Container implements ContainerInterface
     }
 
     /**
+     * Generate the  for definitions.
+     *
+     * @throws \Zp\Container\ContainerException
+     * @throws \Zend\Code\Generator\Exception\InvalidArgumentException
+     * @throws \ReflectionException
+     */
+    public function compileContainer()
+    {
+        $builder = new ContainerCompiler();
+        foreach (array_keys($this->definitions) as $id) {
+            $builder->addDefinition($this->getDefinition($id), $this);
+        }
+        $builder->compileAndSave($this->compiledContainerFile);
+    }
+
+    /**
+     * Load compiled container.
+     *
+     * @return void
+     * @throws \Zp\Container\ContainerException
+     */
+    public function loadCompiledContainer()
+    {
+        if ($this->compiledContainer) {
+            throw new ContainerException('Compiled container already loaded');
+        }
+        /** @noinspection PhpIncludeInspection */
+        require_once $this->compiledContainerFile;
+        /** @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
+        /** @noinspection PhpUndefinedClassInspection */
+        $this->compiledContainer = new \Zp\Container\CompiledContainer;
+    }
+
+    /**
+     * Retrieve definition.
+     *
      * @param string $id
-     * @return Definition|mixed
+     * @return Definition
      * @throws ContainerException
      */
     private function getDefinition($id)
@@ -170,7 +223,7 @@ class Container implements ContainerInterface
     {
         /** @noinspection PhpUnusedParameterInspection */
         /** @noinspection MoreThanThreeArgumentsInspection */
-        $proxy = $this->proxyFactory->createProxy(
+        return $this->proxyFactory->createProxy(
             $definition->className,
             function (& $wrappedObject, $proxy, $method, $params, & $initializer) use ($definition) {
                 $wrappedObject = $this->createInstance($definition);
@@ -178,11 +231,10 @@ class Container implements ContainerInterface
                 return true;
             }
         );
-        return $proxy;
     }
 
     /**
-     * Создает экземпляр объекта
+     * Create instance of object.
      *
      * @param Definition $definition
      * @return mixed
@@ -191,6 +243,11 @@ class Container implements ContainerInterface
      */
     private function createInstance(Definition $definition)
     {
+        if ($this->compiledContainer) {
+            $compiledMethod = $definition->compiledMethod;
+            return $this->compiledContainer->$compiledMethod($this);
+        }
+
         if ($definition->isFactory) {
             $factory = $definition->factory;
             return $factory($this);
@@ -201,95 +258,45 @@ class Container implements ContainerInterface
         $reflector = new \ReflectionClass($definition->className);
         $constructor = $reflector->getConstructor();
 
-        $instance = new $definition->className(
-            ...$this->resolveArguments($definition->arguments, $constructor)
-        );
+        try {
+            $instance = new $definition->className(
+                ...ArgumentsResolver::resolveAsIs($this, $definition->arguments, $constructor)
+            );
+        } catch (\Exception $e) {
+            throw new ContainerException("Unable to invoke arguments to constructor: {$e->getMessage()}", 0, $e);
+        }
 
         foreach ($definition->methods as $methodName => $methodArgs) {
-            $callable = [$instance, $methodName];
-            if (!is_callable($callable)) {
+            if (!$reflector->hasMethod($methodName)) {
                 throw new ContainerException(sprintf(
-                    'Definition `%s` does not exists method `%s::%s`',
+                    'Definition `%s` have non-existent method `%s::%s`',
                     $definition->name,
-                    get_class($instance),
+                    $definition->className,
                     $methodName
                 ));
             }
+
             $method = $reflector->getMethod($methodName);
-            $callable(...$this->resolveArguments($methodArgs, $method));
+            if ($method->isPrivate()) {
+                throw new ContainerException(sprintf(
+                    'Definition `%s` have private method `%s::%s`',
+                    $definition->name,
+                    $definition->className,
+                    $methodName
+                ));
+            }
+            try {
+                $method->invoke($instance, ...ArgumentsResolver::resolveAsIs($this, $methodArgs, $method));
+            } catch (\Exception $e) {
+                throw new ContainerException(
+                    sprintf('Unable to invoke arguments to method %s: %s', $methodName, $e->getMessage()),
+                    0,
+                    $e
+                );
+            }
         }
 
         return $instance;
-    }
-
-    /**
-     * @param array $arguments
-     * @param \ReflectionMethod $method
-     * @return array
-     * @throws ContainerException
-     */
-    private function resolveArguments(array $arguments, \ReflectionMethod $method)
-    {
-        if ($method->getNumberOfParameters() === 0) {
-            if (count($arguments) > 0) {
-                throw new ContainerException("Method `{$method->name}` have no any arguments");
-            }
-            return [];
-        }
-
-        $parameters = $method->getParameters();
-
-        $result = [];
-        foreach ($parameters as $parameter) {
-            // match by position
-            if (array_key_exists($parameter->getPosition(), $arguments)) {
-                $result[] = $this->resolveArgument($arguments[$parameter->getPosition()]);
-                continue;
-            }
-            // match by name
-            if (array_key_exists($parameter->getName(), $arguments)) {
-                $result[] = $this->resolveArgument($arguments[$parameter->getName()]);
-                continue;
-            }
-            // autowiring
-            $class = $parameter->getClass();
-            $className = $class ? $class->getName() : null;
-            if ($class !== null && $this->has($className)) {
-                $result[] = $this->get($className);
-                continue;
-            }
-            // skip optional parameters
-            if ($parameter->isOptional()) {
-                $result[] = $parameter->getDefaultValue();
-                continue;
-            }
-
-            throw new ContainerException(
-                "Unable to resolve parameter `{$parameter->name}` of method `{$method->name}`"
-            );
-        }
-        return $result;
-    }
-
-    /**
-     * @param string $value
-     * @return mixed
-     * @throws ContainerException
-     */
-    private function resolveArgument($value)
-    {
-        if (is_string($value)) {
-            if ($value[0] === '$') {
-                return $this->get(substr($value, 1));
-            }
-            if ($this->has($value)) {
-                return $this->get($value);
-            }
-        }
-        if ($value instanceof \Closure) {
-            return $value($this);
-        }
-        return $value;
     }
 
     /**

@@ -24,4 +24,12 @@ class ClassDependency
     {
         return $this->foo;
     }
+
+    /**
+     * @param Foo $foo
+     */
+    public function setFoo(Foo $foo)
+    {
+        $this->foo = $foo;
+    }
 }

@@ -4,7 +4,7 @@ namespace Zp\Container\Tests\Definition;
 
 use Zp\Container\Definition;
 
-class ConfigTest extends \PHPUnit_Framework_TestCase
+class DefinitionTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @expectedException \Zp\Container\ContainerException
@@ -49,7 +49,6 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($definition->isSingleton);
         $this->assertTrue($definition->isFactory);
         $this->assertFalse($definition->isLazy);
-
     }
 
     public function testEmptyConfig()

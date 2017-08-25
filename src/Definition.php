@@ -20,6 +20,11 @@ class Definition
     /**
      * @var string
      */
+    public $compiledMethod;
+
+    /**
+     * @var string
+     */
     public $className;
 
     /**
@@ -64,6 +69,7 @@ class Definition
         $this->ensureConfigIsArrayOrClosure($config);
 
         $this->name = $name;
+        $this->compiledMethod = 'create_' . str_replace('\\', '_', $name);
         $className = class_exists($name) ? $name : null;
 
         if ($config instanceof \Closure) {
@@ -112,10 +118,8 @@ class Definition
             if (!$name) {
                 throw new ContainerException('Name of method cannot be empty');
             }
-            if (!is_array($args)) {
-                throw new ContainerException("Arguments of method {$name} should be array");
-            }
-            $result[$name] = $args;
+            // cast to array
+            $result[$name] = (array)$args;
         }
         return $result;
     }

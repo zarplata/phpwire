@@ -39,7 +39,7 @@ class DependencyTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Psr\Container\ContainerExceptionInterface
-     * @expectedExceptionMessage Unable to resolve parameter `number` of method `__construct`
+     * @expectedExceptionMessage Unable to create instance of entry `Zp\Container\Tests\Fixtures\ScalarDependency`: Unable to invoke arguments to constructor: Please provide definition for argument `number`
      */
     public function testUnresolvedDependencies()
     {
