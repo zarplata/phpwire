@@ -31,7 +31,7 @@ class ContainerCompiler
      * @throws \ReflectionException
      * @throws \Zp\Container\ContainerException
      */
-    public function addDefinition(Definition $definition, ContainerInterface $container)
+    public function addDefinition(Definition $definition, ContainerInterface $container): void
     {
         try {
             $sourceCode = $definition->isFactory
@@ -53,7 +53,7 @@ class ContainerCompiler
      * Compile definitions
      * @return string
      */
-    public function compile()
+    public function compile(): string
     {
         return '<?php' . PHP_EOL . $this->classGenerator->generate();
     }
@@ -62,16 +62,16 @@ class ContainerCompiler
      * Compile definitions and save to file
      * @param string $filename
      */
-    public function compileAndSave($filename)
+    public function compileAndSave($filename): void
     {
         file_put_contents($filename, $this->compile());
     }
 
     /**
      * @param ArgumentInterface[] $arguments
-     * @return string[]
+     * @return string
      */
-    private function argumentsToSourceCode(array $arguments)
+    private function argumentsToSourceCode(array $arguments): string
     {
         $sourceCodeLines = [];
         foreach ($arguments as $argument) {
@@ -85,7 +85,7 @@ class ContainerCompiler
      * @return string
      * @throws \ReflectionException
      */
-    private function closureToSourceCode(\Closure $c)
+    private function closureToSourceCode(\Closure $c): string
     {
         $reflector = new \ReflectionFunction($c);
         $lines = file($reflector->getFileName());
@@ -104,7 +104,7 @@ class ContainerCompiler
      * @throws \Zp\Container\ContainerException
      * @throws \ReflectionException
      */
-    private function classToSourceCode(Definition $definition, ContainerInterface $container)
+    private function classToSourceCode(Definition $definition, ContainerInterface $container): string
     {
         $reflector = new \ReflectionClass($definition->className);
         // constructor

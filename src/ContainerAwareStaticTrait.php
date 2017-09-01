@@ -16,6 +16,8 @@ trait ContainerAwareStaticTrait
     /**
      * @param string $id
      * @return mixed
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function getService($id)
     {
@@ -25,7 +27,7 @@ trait ContainerAwareStaticTrait
     /**
      * @return ContainerInterface
      */
-    public function getContainer()
+    public function getContainer(): ContainerInterface
     {
         return self::$container;
     }
@@ -33,7 +35,7 @@ trait ContainerAwareStaticTrait
     /**
      * @param ContainerInterface $container
      */
-    public function setContainer(ContainerInterface $container)
+    public function setContainer(ContainerInterface $container): void
     {
         self::setStaticContainer($container);
     }
@@ -41,7 +43,7 @@ trait ContainerAwareStaticTrait
     /**
      * @param ContainerInterface $container
      */
-    public static function setStaticContainer(ContainerInterface $container)
+    public static function setStaticContainer(ContainerInterface $container): void
     {
         self::$container = $container;
     }

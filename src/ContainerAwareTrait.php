@@ -14,6 +14,8 @@ trait ContainerAwareTrait
     /**
      * @param string $id
      * @return mixed
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws \Psr\Container\ContainerExceptionInterface
      * @throws Container
      */
     public function getService($id)
@@ -24,7 +26,7 @@ trait ContainerAwareTrait
     /**
      * @return ContainerInterface
      */
-    public function getContainer()
+    public function getContainer(): ContainerInterface
     {
         return $this->container;
     }
@@ -32,7 +34,7 @@ trait ContainerAwareTrait
     /**
      * @param ContainerInterface $container
      */
-    public function setContainer(ContainerInterface $container)
+    public function setContainer(ContainerInterface $container): void
     {
         $this->container = $container;
     }

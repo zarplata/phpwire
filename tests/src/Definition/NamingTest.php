@@ -2,11 +2,12 @@
 
 namespace Zp\Container\Tests\Definition;
 
+use PHPUnit\Framework\TestCase;
 use Zp\Container\Definition;
 use Zp\Container\Tests\Fixtures\Foo;
 use Zp\Container\Tests\Fixtures\FooInterface;
 
-class NamingTest extends \PHPUnit_Framework_TestCase
+class NamingTest extends TestCase
 {
     /**
      * @dataProvider providerOfEmptyDefinitions

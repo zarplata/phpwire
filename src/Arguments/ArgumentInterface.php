@@ -15,5 +15,5 @@ interface ArgumentInterface
     /**
      * @return string
      */
-    public function resolveSourceCode();
+    public function resolveSourceCode(): string;
 }

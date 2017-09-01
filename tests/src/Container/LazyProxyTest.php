@@ -2,6 +2,7 @@
 
 namespace Zp\Container\Tests\Container;
 
+use PHPUnit\Framework\TestCase;
 use ProxyManager\Proxy\VirtualProxyInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -9,7 +10,7 @@ use Zp\Container\Container;
 use Zp\Container\ProxyFactory;
 use Zp\Container\Tests\Fixtures\Foo;
 
-class LazyProxyTest extends \PHPUnit_Framework_TestCase
+class LazyProxyTest extends TestCase
 {
     private $tmpDir;
 

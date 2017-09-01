@@ -32,17 +32,13 @@ class Container implements ContainerInterface
     private $compiledContainerFile;
 
     /**
-     * @var \Zp\Container\CompiledContainer
+     * @var \Zp\Container\
      */
     private $compiledContainer;
 
     public function __construct(array $definitions, ProxyFactory $proxyFactory = null, $compiledContainerFile = null)
     {
-        $this->singletons = [
-            'container' => $this,
-            static::class => $this,
-            ContainerInterface::class => $this,
-        ];
+        $this->reset();
         $this->definitions = $definitions;
         $this->proxyFactory = $proxyFactory;
         $this->compiledContainerFile = $compiledContainerFile;
@@ -60,7 +56,7 @@ class Container implements ContainerInterface
      * @return bool
      * @throws ContainerException
      */
-    public function has($id)
+    public function has($id): bool
     {
         $this->ensureIdentifierIsString($id);
         $this->ensureIdentifierIsNotEmpty($id);
@@ -100,7 +96,7 @@ class Container implements ContainerInterface
      * @param string $id
      * @param mixed $value
      */
-    public function set($id, $value)
+    public function set($id, $value): void
     {
         if ($value instanceof \Closure) {
             $this->definitions[$id] = $value;
@@ -114,11 +110,12 @@ class Container implements ContainerInterface
      * Drop state of container.
      * Useful for unit tests.
      */
-    public function reset()
+    public function reset(): void
     {
         $this->singletons = [
             'container' => $this,
             static::class => $this,
+            ContainerInterface::class => $this,
         ];
         $this->definitions = [];
     }
@@ -128,7 +125,7 @@ class Container implements ContainerInterface
      *
      * @throws ContainerException
      */
-    public function generateProxies()
+    public function generateProxies(): void
     {
         foreach (array_keys($this->definitions) as $id) {
             $definition = $this->getDefinition($id);
@@ -141,11 +138,11 @@ class Container implements ContainerInterface
     /**
      * Generate the  for definitions.
      *
-     * @throws \Zp\Container\ContainerException
+     * @throws ContainerException
      * @throws \Zend\Code\Generator\Exception\InvalidArgumentException
      * @throws \ReflectionException
      */
-    public function compileContainer()
+    public function compileContainer(): void
     {
         $builder = new ContainerCompiler();
         foreach (array_keys($this->definitions) as $id) {
@@ -158,15 +155,17 @@ class Container implements ContainerInterface
      * Load compiled container.
      *
      * @return void
-     * @throws \Zp\Container\ContainerException
+     * @throws ContainerException
      */
-    public function loadCompiledContainer()
+    public function loadCompiledContainer(): void
     {
         if ($this->compiledContainer) {
             throw new ContainerException('Compiled container already loaded');
         }
+
         /** @noinspection PhpIncludeInspection */
         require_once $this->compiledContainerFile;
+
         /** @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
         /** @noinspection PhpUndefinedClassInspection */
         $this->compiledContainer = new \Zp\Container\CompiledContainer;
@@ -179,7 +178,7 @@ class Container implements ContainerInterface
      * @return Definition
      * @throws ContainerException
      */
-    private function getDefinition($id)
+    private function getDefinition($id): Definition
     {
         $definition = $this->definitions[$id];
         if ($definition instanceof Definition) {
@@ -220,7 +219,7 @@ class Container implements ContainerInterface
      * @throws ContainerException
      * @throws \ReflectionException
      */
-    private function createProxy(Definition $definition)
+    private function createProxy(Definition $definition): LazyLoadingInterface
     {
         /** @noinspection PhpUnusedParameterInspection */
         /** @noinspection MoreThanThreeArgumentsInspection */

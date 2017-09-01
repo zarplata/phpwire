@@ -2,9 +2,10 @@
 
 namespace Zp\Container\Tests\Definition;
 
+use PHPUnit\Framework\TestCase;
 use Zp\Container\Definition;
 
-class DefinitionTest extends \PHPUnit_Framework_TestCase
+class DefinitionTest extends TestCase
 {
     /**
      * @expectedException \Zp\Container\ContainerException

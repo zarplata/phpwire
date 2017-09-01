@@ -2,6 +2,7 @@
 
 namespace Zp\Container\Tests\Caching;
 
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Zp\Container\ContainerCompiler;
 use Zp\Container\Definition;
@@ -9,7 +10,7 @@ use Zp\Container\Tests\Fixtures\ClassDependency;
 use Zp\Container\Tests\Fixtures\Foo;
 use Zp\Container\Tests\Fixtures\ScalarDependency;
 
-class ContainerCompilerTest extends \PHPUnit_Framework_TestCase
+class ContainerCompilerTest extends TestCase
 {
     public function testStdClass()
     {

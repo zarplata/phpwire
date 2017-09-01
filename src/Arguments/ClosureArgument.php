@@ -32,7 +32,7 @@ class ClosureArgument implements ArgumentInterface
      * @return string
      * @throws \ReflectionException
      */
-    public function resolveSourceCode()
+    public function resolveSourceCode(): string
     {
         $reflector = new \ReflectionFunction($this->closure);
         $content = file($reflector->getFileName());

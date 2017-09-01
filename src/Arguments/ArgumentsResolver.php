@@ -20,7 +20,8 @@ class ArgumentsResolver
         ContainerInterface $container,
         array $arguments,
         \ReflectionMethod $method = null
-    ) {
+    ): array
+    {
         $result = [];
         foreach (static::resolve($container, $arguments, $method) as $definition) {
             $result[] = $definition->resolve($container);
@@ -37,7 +38,11 @@ class ArgumentsResolver
      * @return ArgumentInterface[]
      * @throws \Zp\Container\ContainerException
      */
-    public static function resolve(ContainerInterface $container, array $arguments, \ReflectionMethod $method = null)
+    public static function resolve(
+        ContainerInterface $container,
+        array $arguments,
+        \ReflectionMethod $method = null
+    ): array
     {
         $numberOfArguments = $method ? $method->getNumberOfParameters() : 0;
         if (count($arguments) > $numberOfArguments) {

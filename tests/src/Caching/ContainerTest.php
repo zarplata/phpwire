@@ -2,10 +2,11 @@
 
 namespace Zp\Container\Tests\Caching;
 
+use PHPUnit\Framework\TestCase;
 use Zp\Container\Container;
 use Zp\Container\Tests\Fixtures\Foo;
 
-class ContainerTest extends \PHPUnit_Framework_TestCase
+class ContainerTest extends TestCase
 {
     public function testGenerateCacheFile()
     {

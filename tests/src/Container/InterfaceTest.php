@@ -2,9 +2,10 @@
 
 namespace Zp\Container\Tests\Container;
 
+use PHPUnit\Framework\TestCase;
 use Zp\Container\Container;
 
-class InterfaceTest extends \PHPUnit_Framework_TestCase
+class InterfaceTest extends TestCase
 {
     public function testHas()
     {

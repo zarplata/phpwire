@@ -2,6 +2,7 @@
 
 namespace Zp\Container\Tests\Container;
 
+use PHPUnit\Framework\TestCase;
 use Zp\Container\Container;
 use Zp\Container\Tests\Fixtures\ClassDependency;
 use Zp\Container\Tests\Fixtures\InterfaceDependency;
@@ -9,7 +10,7 @@ use Zp\Container\Tests\Fixtures\ScalarDependency;
 use Zp\Container\Tests\Fixtures\Foo;
 use Zp\Container\Tests\Fixtures\FooInterface;
 
-class DependencyTest extends \PHPUnit_Framework_TestCase
+class DependencyTest extends TestCase
 {
     public function testClassDependency()
     {

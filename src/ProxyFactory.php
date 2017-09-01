@@ -4,6 +4,8 @@ namespace Zp\Container;
 
 use ProxyManager\Configuration;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
+use ProxyManager\FileLocator\FileLocator;
+use ProxyManager\Proxy\LazyLoadingInterface;
 
 /**
  * Wrapper for `ocramius/proxy-manager`.
@@ -21,7 +23,7 @@ class ProxyFactory
      */
     private $proxyManager;
 
-    public function __construct($proxyDirectory)
+    public function __construct(string $proxyDirectory)
     {
         $this->proxyDirectory = $proxyDirectory;
     }
@@ -33,9 +35,9 @@ class ProxyFactory
      * @param string $className name of the class to be proxied
      * @param \Closure $initializer initializer to be passed to the proxy
      *
-     * @return \ProxyManager\Proxy\LazyLoadingInterface
+     * @return LazyLoadingInterface
      */
-    public function createProxy($className, \Closure $initializer)
+    public function createProxy(string $className, \Closure $initializer): LazyLoadingInterface
     {
         $this->createProxyManager();
         return $this->proxyManager->createProxy($className, $initializer);
@@ -45,7 +47,7 @@ class ProxyFactory
      * @param string $className
      * @return void
      */
-    public function generateProxy($className)
+    public function generateProxy(string $className): void
     {
         $this->createProxyManager();
         $this->proxyManager->createProxy($className, function () {
@@ -55,13 +57,14 @@ class ProxyFactory
     /**
      * @return void
      */
-    private function createProxyManager()
+    private function createProxyManager(): void
     {
         if ($this->proxyManager !== null) {
             return;
         }
         $config = new Configuration();
         $config->setProxiesTargetDir($this->proxyDirectory);
+        $config->setGeneratorStrategy(new ProxyFileWriterGeneratorStrategy(new FileLocator($this->proxyDirectory)));
         spl_autoload_register($config->getProxyAutoloader());
         $this->proxyManager = new LazyLoadingValueHolderFactory($config);
     }

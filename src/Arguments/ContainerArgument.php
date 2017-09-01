@@ -17,14 +17,6 @@ class ContainerArgument implements ArgumentInterface
     }
 
     /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
      * @param ContainerInterface $container
      * @return mixed
      * @throws \Psr\Container\ContainerExceptionInterface
@@ -37,7 +29,7 @@ class ContainerArgument implements ArgumentInterface
     /**
      * @return string
      */
-    public function resolveSourceCode()
+    public function resolveSourceCode(): string
     {
         return sprintf('$container->get(\'%s\')', $this->name);
     }

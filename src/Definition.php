@@ -79,56 +79,25 @@ class Definition
             return;
         }
 
-        $this->className = self::parseConfig(self::CONFIG_CLASS, $config, $className);
-        $this->arguments = (array)self::parseConfig(self::CONFIG_ARGS, $config, []);
-        $this->methods = self::parseMethods($config);
-        $this->isSingleton = (bool)self::parseConfig(self::CONFIG_SINGLETON, $config, $this->isSingleton);
-        $this->isLazy = (bool)self::parseConfig(self::CONFIG_LAZY, $config, $this->isLazy);
+        $this->className = $config[self::CONFIG_CLASS] ?? $className;
+        $this->arguments = (array)($config[self::CONFIG_ARGS] ?? []);
+        $this->methods = array_map(function ($args) {
+            return (array)$args;
+        }, (array)($config[self::CONFIG_METHODS] ?? []));
+        $this->isSingleton = (bool)($config[self::CONFIG_SINGLETON] ?? $this->isSingleton);
+        $this->isLazy = (bool)($config[self::CONFIG_LAZY] ?? $this->isLazy);
 
-        if ($factoryDefinition = self::parseConfig(self::CONFIG_FACTORY, $config)) {
+        if ($factoryDefinition = $config[self::CONFIG_FACTORY]) {
             $this->isFactory = true;
             $this->factory = $factoryDefinition;
         }
     }
 
     /**
-     * @param string $name
-     * @param array $definition
-     * @param null $default
-     * @return mixed|null
-     */
-    private static function parseConfig($name, array $definition, $default = null)
-    {
-        return array_key_exists($name, $definition) ? $definition[$name] : $default;
-    }
-
-    /**
-     * @param array $config
-     * @return array
-     * @throws ContainerException
-     */
-    private static function parseMethods(array $config)
-    {
-        $methods = self::parseConfig(self::CONFIG_METHODS, $config, []);
-        if (!is_array($methods)) {
-            throw new ContainerException('Methods definition should be array');
-        }
-        $result = [];
-        foreach ($methods as $name => $args) {
-            if (!$name) {
-                throw new ContainerException('Name of method cannot be empty');
-            }
-            // cast to array
-            $result[$name] = (array)$args;
-        }
-        return $result;
-    }
-
-    /**
      * @param mixed $name
      * @throws ContainerException
      */
-    private function ensureNameIsNotEmpty($name)
+    private function ensureNameIsNotEmpty($name): void
     {
         if (!is_string($name) || $name === '') {
             throw new ContainerException('Name cannot be empty');
@@ -139,7 +108,7 @@ class Definition
      * @param mixed $definition
      * @throws ContainerException
      */
-    private function ensureConfigIsArrayOrClosure($definition)
+    private function ensureConfigIsArrayOrClosure($definition): void
     {
         if (!is_array($definition) && !$definition instanceof \Closure) {
             throw new ContainerException('Definition config must be closure or array');

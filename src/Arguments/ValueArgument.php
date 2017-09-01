@@ -31,7 +31,7 @@ class ValueArgument implements ArgumentInterface
     /**
      * @return string
      */
-    public function resolveSourceCode()
+    public function resolveSourceCode(): string
     {
         return sprintf('%s', var_export($this->value, true));
     }
