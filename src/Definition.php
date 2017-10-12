@@ -87,7 +87,7 @@ class Definition
         $this->isSingleton = (bool)($config[self::CONFIG_SINGLETON] ?? $this->isSingleton);
         $this->isLazy = (bool)($config[self::CONFIG_LAZY] ?? $this->isLazy);
 
-        if ($factoryDefinition = $config[self::CONFIG_FACTORY]) {
+        if ($factoryDefinition = ($config[self::CONFIG_FACTORY] ?? null)) {
             $this->isFactory = true;
             $this->factory = $factoryDefinition;
         }
