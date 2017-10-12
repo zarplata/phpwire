@@ -1,6 +1,8 @@
+PHPWire
+=======
+
 Yet another IoC Container
-=========================
 
 ```
-composer require zp/container
+composer require zp/phpwire
 ```

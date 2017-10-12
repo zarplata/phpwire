@@ -1,14 +1,14 @@
 <?php
 
-namespace Zp\Container\Tests\Caching;
+namespace Zp\PHPWire\Tests\Caching;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Zp\Container\ContainerCompiler;
-use Zp\Container\Definition;
-use Zp\Container\Tests\Fixtures\ClassDependency;
-use Zp\Container\Tests\Fixtures\Foo;
-use Zp\Container\Tests\Fixtures\ScalarDependency;
+use Zp\PHPWire\ContainerCompiler;
+use Zp\PHPWire\Definition;
+use Zp\PHPWire\Tests\Fixtures\ClassDependency;
+use Zp\PHPWire\Tests\Fixtures\Foo;
+use Zp\PHPWire\Tests\Fixtures\ScalarDependency;
 
 class ContainerCompilerTest extends TestCase
 {
@@ -22,12 +22,12 @@ class ContainerCompilerTest extends TestCase
         $builder->addDefinition($definition, $container);
         // assert
         $this->assertEquals('<?php
-namespace Zp\Container;
+namespace Zp\PHPWire;
 
 class CompiledContainer
 {
 
-    use \Zp\Container\ContainerAwareTrait;
+    use \Zp\PHPWire\ContainerAwareTrait;
 
     public function create_stdClass($container)
     {
@@ -56,12 +56,12 @@ class CompiledContainer
         $builder->addDefinition($definition, $container);
         // assert
         $this->assertEquals('<?php
-namespace Zp\Container;
+namespace Zp\PHPWire;
 
 class CompiledContainer
 {
 
-    use \Zp\Container\ContainerAwareTrait;
+    use \Zp\PHPWire\ContainerAwareTrait;
 
     public function create_stdClass($container)
     {
@@ -92,16 +92,16 @@ class CompiledContainer
         $builder->addDefinition($definition, $container);
         // assert
         $this->assertEquals('<?php
-namespace Zp\Container;
+namespace Zp\PHPWire;
 
 class CompiledContainer
 {
 
-    use \Zp\Container\ContainerAwareTrait;
+    use \Zp\PHPWire\ContainerAwareTrait;
 
-    public function create_Zp_Container_Tests_Fixtures_ClassDependency($container)
+    public function create_Zp_PHPWire_Tests_Fixtures_ClassDependency($container)
     {
-        $instance = new \Zp\Container\Tests\Fixtures\ClassDependency(call_user_func(function(ContainerInterface $container) {return new Foo();}, $container));
+        $instance = new \Zp\PHPWire\Tests\Fixtures\ClassDependency(call_user_func(function(ContainerInterface $container) {return new Foo();}, $container));
         return $instance;
     }
 
@@ -121,16 +121,16 @@ class CompiledContainer
         $builder->addDefinition($definition, $container);
         // assert
         $this->assertEquals('<?php
-namespace Zp\Container;
+namespace Zp\PHPWire;
 
 class CompiledContainer
 {
 
-    use \Zp\Container\ContainerAwareTrait;
+    use \Zp\PHPWire\ContainerAwareTrait;
 
-    public function create_Zp_Container_Tests_Fixtures_ClassDependency($container)
+    public function create_Zp_PHPWire_Tests_Fixtures_ClassDependency($container)
     {
-        $instance = new \Zp\Container\Tests\Fixtures\ClassDependency($container->get(\'Zp\Container\Tests\Fixtures\Foo\'));
+        $instance = new \Zp\PHPWire\Tests\Fixtures\ClassDependency($container->get(\'Zp\PHPWire\Tests\Fixtures\Foo\'));
         return $instance;
     }
 
@@ -153,16 +153,16 @@ class CompiledContainer
         $builder->addDefinition($definition, $container);
         // assert
         $this->assertEquals('<?php
-namespace Zp\Container;
+namespace Zp\PHPWire;
 
 class CompiledContainer
 {
 
-    use \Zp\Container\ContainerAwareTrait;
+    use \Zp\PHPWire\ContainerAwareTrait;
 
-    public function create_Zp_Container_Tests_Fixtures_ScalarDependency($container)
+    public function create_Zp_PHPWire_Tests_Fixtures_ScalarDependency($container)
     {
-        $instance = new \Zp\Container\Tests\Fixtures\ScalarDependency(123);
+        $instance = new \Zp\PHPWire\Tests\Fixtures\ScalarDependency(123);
         return $instance;
     }
 
@@ -188,17 +188,17 @@ class CompiledContainer
         $builder->addDefinition($definition, $container);
         // assert
         $this->assertEquals('<?php
-namespace Zp\Container;
+namespace Zp\PHPWire;
 
 class CompiledContainer
 {
 
-    use \Zp\Container\ContainerAwareTrait;
+    use \Zp\PHPWire\ContainerAwareTrait;
 
-    public function create_Zp_Container_Tests_Fixtures_ClassDependency($container)
+    public function create_Zp_PHPWire_Tests_Fixtures_ClassDependency($container)
     {
-        $instance = new \Zp\Container\Tests\Fixtures\ClassDependency(123);
-        $instance->setFoo($container->get(\'Zp\Container\Tests\Fixtures\Foo\'))
+        $instance = new \Zp\PHPWire\Tests\Fixtures\ClassDependency(123);
+        $instance->setFoo($container->get(\'Zp\PHPWire\Tests\Fixtures\Foo\'))
         return $instance;
     }
 

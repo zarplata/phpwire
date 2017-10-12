@@ -1,6 +1,6 @@
 <?php
 
-namespace Zp\Container;
+namespace Zp\PHPWire;
 
 use ProxyManager\Exception\FileNotWritableException;
 use ProxyManager\FileLocator\FileLocatorInterface;

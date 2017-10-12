@@ -1,6 +1,6 @@
 <?php
 
-namespace Zp\Container;
+namespace Zp\PHPWire;
 
 use ProxyManager\Configuration;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;

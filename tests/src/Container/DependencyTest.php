@@ -1,14 +1,14 @@
 <?php
 
-namespace Zp\Container\Tests\Container;
+namespace Zp\PHPWire\Tests\Container;
 
 use PHPUnit\Framework\TestCase;
-use Zp\Container\Container;
-use Zp\Container\Tests\Fixtures\ClassDependency;
-use Zp\Container\Tests\Fixtures\InterfaceDependency;
-use Zp\Container\Tests\Fixtures\ScalarDependency;
-use Zp\Container\Tests\Fixtures\Foo;
-use Zp\Container\Tests\Fixtures\FooInterface;
+use Zp\PHPWire\Container;
+use Zp\PHPWire\Tests\Fixtures\ClassDependency;
+use Zp\PHPWire\Tests\Fixtures\InterfaceDependency;
+use Zp\PHPWire\Tests\Fixtures\ScalarDependency;
+use Zp\PHPWire\Tests\Fixtures\Foo;
+use Zp\PHPWire\Tests\Fixtures\FooInterface;
 
 class DependencyTest extends TestCase
 {
@@ -40,7 +40,7 @@ class DependencyTest extends TestCase
 
     /**
      * @expectedException \Psr\Container\ContainerExceptionInterface
-     * @expectedExceptionMessage Unable to create instance of entry `Zp\Container\Tests\Fixtures\ScalarDependency`: Unable to invoke arguments to constructor: Please provide definition for argument `number`
+     * @expectedExceptionMessage Unable to create instance of entry `Zp\PHPWire\Tests\Fixtures\ScalarDependency`: Unable to invoke arguments to constructor: Please provide definition for argument `number`
      */
     public function testUnresolvedDependencies()
     {

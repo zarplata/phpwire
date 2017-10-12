@@ -1,9 +1,9 @@
 <?php
 
-namespace Zp\Container\Arguments;
+namespace Zp\PHPWire\Arguments;
 
 use Psr\Container\ContainerInterface;
-use Zp\Container\ContainerException;
+use Zp\PHPWire\ContainerException;
 
 class ArgumentsResolver
 {
@@ -14,7 +14,7 @@ class ArgumentsResolver
      * @param array $arguments
      * @param \ReflectionMethod|null $method
      * @return array
-     * @throws \Zp\Container\ContainerException
+     * @throws \Zp\PHPWire\ContainerException
      */
     public static function resolveAsIs(
         ContainerInterface $container,
@@ -36,7 +36,7 @@ class ArgumentsResolver
      * @param array $arguments
      * @param \ReflectionMethod $method
      * @return ArgumentInterface[]
-     * @throws \Zp\Container\ContainerException
+     * @throws \Zp\PHPWire\ContainerException
      */
     public static function resolve(
         ContainerInterface $container,

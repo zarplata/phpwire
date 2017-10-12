@@ -1,11 +1,11 @@
 <?php
 
-namespace Zp\Container\Tests\Definition;
+namespace Zp\PHPWire\Tests\Definition;
 
 use PHPUnit\Framework\TestCase;
-use Zp\Container\Definition;
-use Zp\Container\Tests\Fixtures\Foo;
-use Zp\Container\Tests\Fixtures\FooInterface;
+use Zp\PHPWire\Definition;
+use Zp\PHPWire\Tests\Fixtures\Foo;
+use Zp\PHPWire\Tests\Fixtures\FooInterface;
 
 class NamingTest extends TestCase
 {

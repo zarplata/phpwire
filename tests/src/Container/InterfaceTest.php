@@ -1,9 +1,9 @@
 <?php
 
-namespace Zp\Container\Tests\Container;
+namespace Zp\PHPWire\Tests\Container;
 
 use PHPUnit\Framework\TestCase;
-use Zp\Container\Container;
+use Zp\PHPWire\Container;
 
 class InterfaceTest extends TestCase
 {

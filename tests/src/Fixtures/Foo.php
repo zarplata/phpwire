@@ -1,6 +1,6 @@
 <?php
 
-namespace Zp\Container\Tests\Fixtures;
+namespace Zp\PHPWire\Tests\Fixtures;
 
 class Foo implements FooInterface
 {

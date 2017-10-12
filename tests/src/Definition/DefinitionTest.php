@@ -1,14 +1,14 @@
 <?php
 
-namespace Zp\Container\Tests\Definition;
+namespace Zp\PHPWire\Tests\Definition;
 
 use PHPUnit\Framework\TestCase;
-use Zp\Container\Definition;
+use Zp\PHPWire\Definition;
 
 class DefinitionTest extends TestCase
 {
     /**
-     * @expectedException \Zp\Container\ContainerException
+     * @expectedException \Zp\PHPWire\ContainerException
      * @expectedExceptionMessage Definition config must be closure or array
      */
     public function testConfigMustBeClosureOrArray()

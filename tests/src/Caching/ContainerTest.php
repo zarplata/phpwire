@@ -1,10 +1,10 @@
 <?php
 
-namespace Zp\Container\Tests\Caching;
+namespace Zp\PHPWire\Tests\Caching;
 
 use PHPUnit\Framework\TestCase;
-use Zp\Container\Container;
-use Zp\Container\Tests\Fixtures\Foo;
+use Zp\PHPWire\Container;
+use Zp\PHPWire\Tests\Fixtures\Foo;
 
 class ContainerTest extends TestCase
 {
@@ -20,16 +20,16 @@ class ContainerTest extends TestCase
         $container->compileContainer();
         // assert
         $this->assertStringEqualsFile($cacheFile, '<?php
-namespace Zp\Container;
+namespace Zp\PHPWire;
 
 class CompiledContainer
 {
 
-    use \Zp\Container\ContainerAwareTrait;
+    use \Zp\PHPWire\ContainerAwareTrait;
 
-    public function create_Zp_Container_Tests_Fixtures_Foo($container)
+    public function create_Zp_PHPWire_Tests_Fixtures_Foo($container)
     {
-        $instance = new \Zp\Container\Tests\Fixtures\Foo();
+        $instance = new \Zp\PHPWire\Tests\Fixtures\Foo();
         return $instance;
     }
 
@@ -46,11 +46,11 @@ class CompiledContainer
         ];
         $container = new Container($definitions, null);
 
-        $mock = $this->getMockBuilder('Zp\Container\CompiledContainer')
-            ->setMethods(['create_Zp_Container_Tests_Fixtures_Foo'])
+        $mock = $this->getMockBuilder('Zp\PHPWire\CompiledContainer')
+            ->setMethods(['create_Zp_PHPWire_Tests_Fixtures_Foo'])
             ->getMock();
         $mock->expects($this->once())
-            ->method('create_Zp_Container_Tests_Fixtures_Foo')
+            ->method('create_Zp_PHPWire_Tests_Fixtures_Foo')
             ->with($container)
             ->willReturn(new Foo());
 

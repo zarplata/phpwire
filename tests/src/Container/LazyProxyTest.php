@@ -1,14 +1,14 @@
 <?php
 
-namespace Zp\Container\Tests\Container;
+namespace Zp\PHPWire\Tests\Container;
 
 use PHPUnit\Framework\TestCase;
 use ProxyManager\Proxy\VirtualProxyInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
-use Zp\Container\Container;
-use Zp\Container\ProxyFactory;
-use Zp\Container\Tests\Fixtures\Foo;
+use Zp\PHPWire\Container;
+use Zp\PHPWire\ProxyFactory;
+use Zp\PHPWire\Tests\Fixtures\Foo;
 
 class LazyProxyTest extends TestCase
 {

@@ -1,5 +1,5 @@
 {
-  "name": "zp/ioc-container",
+  "name": "zp/phpwire",
   "description": "Yet another IoC Container",
   "type": "library",
   "license": "MIT",
@@ -19,12 +19,12 @@
   },
   "autoload": {
     "psr-4": {
-      "Zp\\Container\\": "src"
+      "Zp\\PHPWire\\": "src"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Zp\\Container\\Tests\\": "tests/src"
+      "Zp\\PHPWire\\Tests\\": "tests/src"
     }
   }
 }

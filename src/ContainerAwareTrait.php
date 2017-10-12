@@ -1,6 +1,6 @@
 <?php
 
-namespace Zp\Container;
+namespace Zp\PHPWire;
 
 use Psr\Container\ContainerInterface;
 

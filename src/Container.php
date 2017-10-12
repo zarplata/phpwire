@@ -1,10 +1,10 @@
 <?php
 
-namespace Zp\Container;
+namespace Zp\PHPWire;
 
 use ProxyManager\Proxy\LazyLoadingInterface;
 use Psr\Container\ContainerInterface;
-use Zp\Container\Arguments\ArgumentsResolver;
+use Zp\PHPWire\Arguments\ArgumentsResolver;
 
 /**
  * IoC container.
@@ -32,7 +32,7 @@ class Container implements ContainerInterface
     private $compiledContainerFile;
 
     /**
-     * @var \Zp\Container\
+     * @var \Zp\PHPWire\
      */
     private $compiledContainer;
 
@@ -168,7 +168,7 @@ class Container implements ContainerInterface
 
         /** @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
         /** @noinspection PhpUndefinedClassInspection */
-        $this->compiledContainer = new \Zp\Container\CompiledContainer;
+        $this->compiledContainer = new \Zp\PHPWire\CompiledContainer;
     }
 
     /**

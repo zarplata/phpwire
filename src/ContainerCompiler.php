@@ -1,12 +1,12 @@
 <?php
 
-namespace Zp\Container;
+namespace Zp\PHPWire;
 
 use Psr\Container\ContainerInterface;
 use Zend\Code\Generator\ClassGenerator;
 use Zend\Code\Generator\MethodGenerator;
-use Zp\Container\Arguments\ArgumentInterface;
-use Zp\Container\Arguments\ArgumentsResolver;
+use Zp\PHPWire\Arguments\ArgumentInterface;
+use Zp\PHPWire\Arguments\ArgumentsResolver;
 
 class ContainerCompiler
 {
@@ -18,7 +18,7 @@ class ContainerCompiler
     public function __construct()
     {
         $this->classGenerator = (new ClassGenerator)
-            ->setName('Zp\\Container\\CompiledContainer')
+            ->setName('Zp\\PHPWire\\CompiledContainer')
             ->addTrait('\\' . ContainerAwareTrait::class);
     }
 
@@ -29,7 +29,7 @@ class ContainerCompiler
      * @param ContainerInterface $container
      * @throws \Zend\Code\Generator\Exception\InvalidArgumentException
      * @throws \ReflectionException
-     * @throws \Zp\Container\ContainerException
+     * @throws \Zp\PHPWire\ContainerException
      */
     public function addDefinition(Definition $definition, ContainerInterface $container): void
     {
@@ -101,7 +101,7 @@ class ContainerCompiler
      * @param Definition $definition
      * @param ContainerInterface $container
      * @return string
-     * @throws \Zp\Container\ContainerException
+     * @throws \Zp\PHPWire\ContainerException
      * @throws \ReflectionException
      */
     private function classToSourceCode(Definition $definition, ContainerInterface $container): string
