@@ -127,6 +127,9 @@ class Container implements ContainerInterface
      */
     public function generateProxies(): void
     {
+        if ($this->proxyFactory === null) {
+            throw new ContainerException('Unable to generate proxies without ProxyFactory');
+        }
         foreach (array_keys($this->definitions) as $id) {
             $definition = $this->getDefinition($id);
             if ($definition->isLazy) {
