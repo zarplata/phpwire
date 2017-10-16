@@ -4,6 +4,7 @@ namespace Zp\PHPWire;
 
 use Psr\Container\ContainerInterface;
 use Zend\Code\Generator\ClassGenerator;
+use Zend\Code\Generator\Exception\InvalidArgumentException;
 use Zend\Code\Generator\MethodGenerator;
 use Zp\PHPWire\Arguments\ArgumentInterface;
 use Zp\PHPWire\Arguments\ArgumentsResolver;
@@ -27,9 +28,8 @@ class ContainerCompiler
      *
      * @param Definition $definition
      * @param ContainerInterface $container
-     * @throws \Zend\Code\Generator\Exception\InvalidArgumentException
-     * @throws \ReflectionException
-     * @throws \Zp\PHPWire\ContainerException
+     * @throws InvalidArgumentException
+     * @throws ContainerException
      */
     public function addDefinition(Definition $definition, ContainerInterface $container): void
     {
@@ -62,7 +62,7 @@ class ContainerCompiler
      * Compile definitions and save to file
      * @param string $filename
      */
-    public function compileAndSave($filename): void
+    public function compileAndSave(string $filename): void
     {
         file_put_contents($filename, $this->compile());
     }
@@ -101,8 +101,7 @@ class ContainerCompiler
      * @param Definition $definition
      * @param ContainerInterface $container
      * @return string
-     * @throws \Zp\PHPWire\ContainerException
-     * @throws \ReflectionException
+     * @throws ContainerException
      */
     private function classToSourceCode(Definition $definition, ContainerInterface $container): string
     {
@@ -110,37 +109,54 @@ class ContainerCompiler
         // constructor
         try {
             $ctorArgumentsSourceCode = $this->argumentsToSourceCode(
-                ArgumentsResolver::resolve($container, $definition->arguments, $reflector->getConstructor())
+                ArgumentsResolver::parseDefinitionsByMethodSignature(
+                    $container,
+                    $definition->arguments,
+                    $reflector->getConstructor()
+                )
             );
         } catch (\Exception $e) {
             throw new ContainerException("Unable to compile arguments for constructor: {$e->getMessage()}", 0, $e);
         }
-
+        // instantiator
         $sourceCodeLines = [
             sprintf('$instance = new \%s(%s);', $definition->className, $ctorArgumentsSourceCode)
         ];
         // methods
-        foreach ($definition->methods as $methodName => $methodArgs) {
-            if (!$reflector->hasMethod($methodName)) {
-                throw new ContainerException(sprintf(
-                    'Definition `%s` have non-existent method `%s::%s`',
-                    $definition->name,
-                    $definition->className,
-                    $methodName
-                ));
-            }
-            $method = $reflector->getMethod($methodName);
-            if ($method->isPrivate()) {
-                throw new ContainerException(sprintf(
-                    'Definition `%s` have private method `%s::%s`',
-                    $definition->name,
-                    $definition->className,
-                    $methodName
-                ));
-            }
+        foreach ($definition->methods as $methodName => $methodDefinitions) {
             try {
-                $methodArgumentsSourceCode = $this->argumentsToSourceCode(
-                    ArgumentsResolver::resolve($container, $methodArgs, $method)
+                switch (true) {
+                    // check own method
+                    case $reflector->hasMethod($methodName) === true:
+                        $method = $reflector->getMethod($methodName);
+                        if ($method->isPrivate()) {
+                            throw new ContainerException(sprintf('method `%s` is private', $methodName));
+                        }
+                        $arguments = ArgumentsResolver::parseDefinitionsByMethodSignature(
+                            $container,
+                            $methodDefinitions,
+                            $method
+                        );
+                        break;
+
+                    // check magic method
+                    case method_exists($reflector->getName(), '__call') === true:
+                        $arguments = ArgumentsResolver::parseDefinitionsAsIs($container, $methodDefinitions);
+                        break;
+
+                    // oh well
+                    default:
+                        throw new ContainerException(sprintf(
+                            'non-existent method `%s::%s`',
+                            $reflector->getName(),
+                            $methodName
+                        ));
+
+                }
+                $sourceCodeLines[] = sprintf(
+                    '$instance->%s(%s)',
+                    $methodName,
+                    $this->argumentsToSourceCode($arguments)
                 );
             } catch (\Exception $e) {
                 throw new ContainerException(
@@ -149,7 +165,6 @@ class ContainerCompiler
                     $e
                 );
             }
-            $sourceCodeLines[] = sprintf('$instance->%s(%s)', $methodName, $methodArgumentsSourceCode);
         }
         $sourceCodeLines[] = sprintf('return $instance;');
 

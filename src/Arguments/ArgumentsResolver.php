@@ -8,46 +8,56 @@ use Zp\PHPWire\ContainerException;
 class ArgumentsResolver
 {
     /**
-     * Resolve arguments definitions as is.
+     * Resolve values of arguments.
      *
      * @param ContainerInterface $container
-     * @param array $arguments
-     * @param \ReflectionMethod|null $method
+     * @param ArgumentInterface[] $arguments
      * @return array
-     * @throws \Zp\PHPWire\ContainerException
      */
-    public static function resolveAsIs(
-        ContainerInterface $container,
-        array $arguments,
-        \ReflectionMethod $method = null
-    ): array
+    public static function resolveArgumentsToValues(ContainerInterface $container, array $arguments): array
     {
         $result = [];
-        foreach (static::resolve($container, $arguments, $method) as $definition) {
-            $result[] = $definition->resolve($container);
+        foreach ($arguments as $argument) {
+            $result[] = $argument->resolve($container);
         }
         return $result;
     }
 
     /**
-     * Resolve argument definitions.
+     * Parse definitions as is to ArgumentInterface.
      *
      * @param ContainerInterface $container
-     * @param array $arguments
+     * @param array $definitions
+     * @return ArgumentInterface[]
+     */
+    public static function parseDefinitionsAsIs(ContainerInterface $container, array $definitions): array
+    {
+        $result = [];
+        foreach ($definitions as $definition) {
+            $result[] = self::parseDefinition($container, $definition);
+        }
+        return $result;
+    }
+
+    /**
+     * Parse definitions using reflection signature to ArgumentInterface.
+     *
+     * @param ContainerInterface $container
+     * @param array $definitions
      * @param \ReflectionMethod $method
      * @return ArgumentInterface[]
-     * @throws \Zp\PHPWire\ContainerException
+     * @throws ContainerException
      */
-    public static function resolve(
+    public static function parseDefinitionsByMethodSignature(
         ContainerInterface $container,
-        array $arguments,
+        array $definitions,
         \ReflectionMethod $method = null
     ): array
     {
         $numberOfArguments = $method ? $method->getNumberOfParameters() : 0;
-        if (count($arguments) > $numberOfArguments) {
-            $numberOfRedundantly = $numberOfArguments - count($arguments);
-            throw new ContainerException("Method definition have {$numberOfRedundantly} redundantly arguments");
+        if (count($definitions) > $numberOfArguments) {
+            $numberOfRedundantly = $numberOfArguments - count($definitions);
+            throw new ContainerException("Method have {$numberOfRedundantly} redundantly defined arguments");
         }
 
         if ($method === null || $method->getNumberOfParameters() === 0) {
@@ -59,13 +69,13 @@ class ArgumentsResolver
         $result = [];
         foreach ($parameters as $parameter) {
             // match by position
-            if (array_key_exists($parameter->getPosition(), $arguments)) {
-                $result[] = static::resolveValue($container, $arguments[$parameter->getPosition()]);
+            if (array_key_exists($parameter->getPosition(), $definitions)) {
+                $result[] = static::parseDefinition($container, $definitions[$parameter->getPosition()]);
                 continue;
             }
             // match by name
-            if (array_key_exists($parameter->getName(), $arguments)) {
-                $result[] = static::resolveValue($container, $arguments[$parameter->getName()]);
+            if (array_key_exists($parameter->getName(), $definitions)) {
+                $result[] = static::parseDefinition($container, $definitions[$parameter->getName()]);
                 continue;
             }
             // autowiring
@@ -89,23 +99,25 @@ class ArgumentsResolver
     }
 
     /**
+     * Parse definition to ArgumentInterface.
+     *
      * @param ContainerInterface $container
-     * @param string $value
-     * @return mixed
+     * @param string $definition
+     * @return ArgumentInterface
      */
-    private static function resolveValue(ContainerInterface $container, $value)
+    private static function parseDefinition(ContainerInterface $container, $definition): ArgumentInterface
     {
-        if (is_string($value)) {
-            if ($value[0] === '$') {
-                return new ContainerArgument(substr($value, 1));
+        if (is_string($definition)) {
+            if ($definition[0] === '$') {
+                return new ContainerArgument(substr($definition, 1));
             }
-            if ($container->has($value)) {
-                return new ContainerArgument($value);
+            if ($container->has($definition)) {
+                return new ContainerArgument($definition);
             }
         }
-        if ($value instanceof \Closure) {
-            return new ClosureArgument($value);
+        if ($definition instanceof \Closure) {
+            return new ClosureArgument($definition);
         }
-        return new ValueArgument($value);
+        return new ValueArgument($definition);
     }
 }

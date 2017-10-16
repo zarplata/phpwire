@@ -8,6 +8,7 @@ use Zp\PHPWire\ContainerCompiler;
 use Zp\PHPWire\Definition;
 use Zp\PHPWire\Tests\Fixtures\ClassDependency;
 use Zp\PHPWire\Tests\Fixtures\Foo;
+use Zp\PHPWire\Tests\Fixtures\MagicMethod;
 use Zp\PHPWire\Tests\Fixtures\ScalarDependency;
 
 class ContainerCompilerTest extends TestCase
@@ -15,11 +16,11 @@ class ContainerCompilerTest extends TestCase
     public function testStdClass()
     {
         // arrange
-        $builder = new ContainerCompiler();
+        $compiler = new ContainerCompiler();
         $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
         $definition = new Definition(\stdClass::class, []);
         // act
-        $builder->addDefinition($definition, $container);
+        $compiler->addDefinition($definition, $container);
         // assert
         $this->assertEquals('<?php
 namespace Zp\PHPWire;
@@ -37,13 +38,13 @@ class CompiledContainer
 
 
 }
-', $builder->compile());
+', $compiler->compile());
     }
 
     public function testFactory()
     {
         // arrange
-        $builder = new ContainerCompiler();
+        $compiler = new ContainerCompiler();
         $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
         $definition = new Definition(\stdClass::class, [
             'factory' => function () {
@@ -53,7 +54,7 @@ class CompiledContainer
             }
         ]);
         // act
-        $builder->addDefinition($definition, $container);
+        $compiler->addDefinition($definition, $container);
         // assert
         $this->assertEquals('<?php
 namespace Zp\PHPWire;
@@ -72,13 +73,13 @@ class CompiledContainer
 
 
 }
-', $builder->compile());
+', $compiler->compile());
     }
 
     public function testCtorClosureArgument()
     {
         // arrange
-        $builder = new ContainerCompiler();
+        $compiler = new ContainerCompiler();
         $container = $this->getMockForAbstractClass(ContainerInterface::class);
         $container->expects($this->any())->method('has')->willReturn(true);
         $definition = new Definition(ClassDependency::class, [
@@ -89,7 +90,7 @@ class CompiledContainer
             ]
         ]);
         // act
-        $builder->addDefinition($definition, $container);
+        $compiler->addDefinition($definition, $container);
         // assert
         $this->assertEquals('<?php
 namespace Zp\PHPWire;
@@ -107,18 +108,18 @@ class CompiledContainer
 
 
 }
-', $builder->compile());
+', $compiler->compile());
     }
 
     public function testCtorContainerArgument()
     {
         // arrange
-        $builder = new ContainerCompiler();
+        $compiler = new ContainerCompiler();
         $container = $this->getMockForAbstractClass(ContainerInterface::class);
         $container->expects($this->any())->method('has')->willReturn(true);
         $definition = new Definition(ClassDependency::class, []);
         // act
-        $builder->addDefinition($definition, $container);
+        $compiler->addDefinition($definition, $container);
         // assert
         $this->assertEquals('<?php
 namespace Zp\PHPWire;
@@ -136,13 +137,13 @@ class CompiledContainer
 
 
 }
-', $builder->compile());
+', $compiler->compile());
     }
 
     public function testCtorScalarArgument()
     {
         // arrange
-        $builder = new ContainerCompiler();
+        $compiler = new ContainerCompiler();
         $container = $this->getMockForAbstractClass(ContainerInterface::class);
         $container->expects($this->any())->method('has')->willReturn(true);
 
@@ -150,7 +151,7 @@ class CompiledContainer
             'args' => [123]
         ]);
         // act
-        $builder->addDefinition($definition, $container);
+        $compiler->addDefinition($definition, $container);
         // assert
         $this->assertEquals('<?php
 namespace Zp\PHPWire;
@@ -168,13 +169,48 @@ class CompiledContainer
 
 
 }
-', $builder->compile());
+', $compiler->compile());
+    }
+
+    public function testMagicMethod()
+    {
+        // arrange
+        $compiler = new ContainerCompiler();
+        $container = $this->getMockForAbstractClass(ContainerInterface::class);
+        $container->expects($this->any())->method('has')->willReturn(true);
+
+        $definition = new Definition(MagicMethod::class, [
+            'methods' => [
+                'setFoo' => ['value']
+            ],
+        ]);
+        // act
+        $compiler->addDefinition($definition, $container);
+        // assert
+        $this->assertEquals('<?php
+namespace Zp\PHPWire;
+
+class CompiledContainer
+{
+
+    use \Zp\PHPWire\ContainerAwareTrait;
+
+    public function create_Zp_PHPWire_Tests_Fixtures_MagicMethod($container)
+    {
+        $instance = new \Zp\PHPWire\Tests\Fixtures\MagicMethod();
+        $instance->setFoo($container->get(\'value\'))
+        return $instance;
+    }
+
+
+}
+', $compiler->compile());
     }
 
     public function testMethodArgument()
     {
         // arrange
-        $builder = new ContainerCompiler();
+        $compiler = new ContainerCompiler();
         $container = $this->getMockForAbstractClass(ContainerInterface::class);
         $container->expects($this->any())->method('has')->willReturn(true);
 
@@ -185,7 +221,7 @@ class CompiledContainer
             ],
         ]);
         // act
-        $builder->addDefinition($definition, $container);
+        $compiler->addDefinition($definition, $container);
         // assert
         $this->assertEquals('<?php
 namespace Zp\PHPWire;
@@ -204,6 +240,6 @@ class CompiledContainer
 
 
 }
-', $builder->compile());
+', $compiler->compile());
     }
 }

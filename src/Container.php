@@ -256,18 +256,29 @@ class Container implements ContainerInterface
         $this->ensureDefinitionClassNameIsNotEmpty($definition);
 
         $reflector = new \ReflectionClass($definition->className);
-        $constructor = $reflector->getConstructor();
 
         try {
-            $instance = new $definition->className(
-                ...ArgumentsResolver::resolveAsIs($this, $definition->arguments, $constructor)
+            $arguments = ArgumentsResolver::parseDefinitionsByMethodSignature(
+                $this,
+                $definition->arguments,
+                $reflector->getConstructor()
             );
+            $instance = new $definition->className(...ArgumentsResolver::resolveArgumentsToValues($this, $arguments));
         } catch (\Exception $e) {
             throw new ContainerException("Unable to invoke arguments to constructor: {$e->getMessage()}", 0, $e);
         }
 
-        foreach ($definition->methods as $methodName => $methodArgs) {
+        foreach ($definition->methods as $methodName => $methodDefinitions) {
             if (!$reflector->hasMethod($methodName)) {
+                // supporting magic methods
+                if (method_exists($definition->className, '__call')) {
+                    $instance->$methodName(...ArgumentsResolver::resolveArgumentsToValues(
+                        $this,
+                        ArgumentsResolver::parseDefinitionsAsIs($this, $methodDefinitions)
+                    ));
+                    continue;
+                }
+                
                 throw new ContainerException(sprintf(
                     'Definition `%s` have non-existent method `%s::%s`',
                     $definition->name,
@@ -286,7 +297,8 @@ class Container implements ContainerInterface
                 ));
             }
             try {
-                $method->invoke($instance, ...ArgumentsResolver::resolveAsIs($this, $methodArgs, $method));
+                $arguments = ArgumentsResolver::parseDefinitionsByMethodSignature($this, $methodDefinitions, $method);
+                $method->invoke($instance, ...ArgumentsResolver::resolveArgumentsToValues($this, $arguments));
             } catch (\Exception $e) {
                 throw new ContainerException(
                     sprintf('Unable to invoke arguments to method %s: %s', $methodName, $e->getMessage()),
