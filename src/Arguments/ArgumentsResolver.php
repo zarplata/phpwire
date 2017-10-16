@@ -56,7 +56,7 @@ class ArgumentsResolver
     {
         $numberOfArguments = $method ? $method->getNumberOfParameters() : 0;
         if (count($definitions) > $numberOfArguments) {
-            $numberOfRedundantly = $numberOfArguments - count($definitions);
+            $numberOfRedundantly = count($definitions) - $numberOfArguments;
             throw new ContainerException("Method have {$numberOfRedundantly} redundantly defined arguments");
         }
 
