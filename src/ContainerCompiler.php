@@ -120,7 +120,7 @@ class ContainerCompiler
         }
         // instantiator
         $sourceCodeLines = [
-            sprintf('$instance = new \%s(%s);', $definition->className, $ctorArgumentsSourceCode)
+            sprintf('$instance = new \\%s(%s);', $definition->className, $ctorArgumentsSourceCode)
         ];
         // methods
         foreach ($definition->methods as $methodName => $methodDefinitions) {

@@ -68,8 +68,8 @@ class Definition
         $this->ensureNameIsNotEmpty($name);
         $this->ensureConfigIsArrayOrClosure($config);
 
-        $this->name = $name;
-        $this->compiledMethod = 'create_' . str_replace('\\', '_', $name);
+        $this->name = \ltrim($name, '\\');
+        $this->compiledMethod = 'create_' . str_replace('\\', '_', $this->name);
         $className = class_exists($name) ? $name : null;
 
         if ($config instanceof \Closure) {
@@ -79,7 +79,7 @@ class Definition
             return;
         }
 
-        $this->className = $config[self::CONFIG_CLASS] ?? $className;
+        $this->className = \ltrim($config[self::CONFIG_CLASS] ?? $className, '\\');
         $this->arguments = (array)($config[self::CONFIG_ARGS] ?? []);
         $this->methods = array_map(function ($args) {
             return (array)$args;

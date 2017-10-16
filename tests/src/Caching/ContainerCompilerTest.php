@@ -242,4 +242,40 @@ class CompiledContainer
 }
 ', $compiler->compile());
     }
+
+    public function testClassNameTrailingSlash()
+    {
+        // arrange
+        $compiler = new ContainerCompiler();
+        $container = $this->getMockForAbstractClass(ContainerInterface::class);
+        $container->expects($this->any())->method('has')->willReturn(true);
+
+        $definition = new Definition('\\' . ClassDependency::class, [
+            'args' => [123],
+            'methods' => [
+                'setFoo' => null
+            ],
+        ]);
+        // act
+        $compiler->addDefinition($definition, $container);
+        // assert
+        $this->assertEquals('<?php
+namespace Zp\PHPWire;
+
+class CompiledContainer
+{
+
+    use \Zp\PHPWire\ContainerAwareTrait;
+
+    public function create_Zp_PHPWire_Tests_Fixtures_ClassDependency($container)
+    {
+        $instance = new \Zp\PHPWire\Tests\Fixtures\ClassDependency(123);
+        $instance->setFoo($container->get(\'Zp\PHPWire\Tests\Fixtures\Foo\'));
+        return $instance;
+    }
+
+
+}
+', $compiler->compile());
+    }
 }
