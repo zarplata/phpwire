@@ -83,7 +83,7 @@ class Zp_PHPWire_CompiledContainer
         $container->expects($this->any())->method('has')->willReturn(true);
         $definition = new Definition(ClassDependency::class, [
             'args' => [
-                'foo' => function () {
+                'foo' => function (ContainerInterface $c) {
                     return new Foo();
                 }
             ]
@@ -99,7 +99,9 @@ class Zp_PHPWire_CompiledContainer
 
     public function create_Zp_PHPWire_Tests_Fixtures_ClassDependency($container)
     {
-        $instance = new \Zp\PHPWire\Tests\Fixtures\ClassDependency(call_user_func(function(ContainerInterface $container) {return new Foo();}, $container));
+        $instance = new \Zp\PHPWire\Tests\Fixtures\ClassDependency(call_user_func(function (\Psr\Container\ContainerInterface $c) {
+            return new \Zp\PHPWire\Tests\Fixtures\Foo();
+        }, $container));
         return $instance;
     }
 

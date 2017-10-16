@@ -3,6 +3,7 @@
 namespace Zp\PHPWire\Arguments;
 
 use Psr\Container\ContainerInterface;
+use SuperClosure\Serializer;
 
 class ClosureArgument implements ArgumentInterface
 {
@@ -30,15 +31,10 @@ class ClosureArgument implements ArgumentInterface
 
     /**
      * @return string
-     * @throws \ReflectionException
      */
     public function resolveSourceCode(): string
     {
-        $reflector = new \ReflectionFunction($this->closure);
-        $content = file($reflector->getFileName());
-        $startLine = $reflector->getStartLine();
-        $endLine = $reflector->getEndLine();
-        $code = trim(implode('', array_slice($content, $startLine, $endLine - $startLine - 1)));
-        return sprintf('call_user_func(function(ContainerInterface $container) {%s}, $container)', $code);
+        $serializer = new Serializer();
+        return sprintf('call_user_func(%s, $container)', rtrim($serializer->getData($this->closure)['code'], ';'));
     }
 }
