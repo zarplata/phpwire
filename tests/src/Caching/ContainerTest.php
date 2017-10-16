@@ -20,9 +20,7 @@ class ContainerTest extends TestCase
         $container->compileContainer();
         // assert
         $this->assertStringEqualsFile($cacheFile, '<?php
-namespace Zp\PHPWire;
-
-class CompiledContainer
+class Zp_PHPWire_CompiledContainer
 {
 
     use \Zp\PHPWire\ContainerAwareTrait;

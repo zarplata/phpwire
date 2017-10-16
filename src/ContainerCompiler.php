@@ -3,6 +3,7 @@
 namespace Zp\PHPWire;
 
 use Psr\Container\ContainerInterface;
+use SuperClosure\Serializer;
 use Zend\Code\Generator\ClassGenerator;
 use Zend\Code\Generator\Exception\InvalidArgumentException;
 use Zend\Code\Generator\MethodGenerator;
@@ -16,11 +17,17 @@ class ContainerCompiler
      */
     private $classGenerator;
 
+    /**
+     * @var Serializer
+     */
+    private $closureSerializer;
+
     public function __construct()
     {
         $this->classGenerator = (new ClassGenerator)
-            ->setName('Zp\\PHPWire\\CompiledContainer')
+            ->setName('Zp_PHPWire_CompiledContainer')
             ->addTrait('\\' . ContainerAwareTrait::class);
+        $this->closureSerializer = new Serializer();
     }
 
     /**
@@ -87,14 +94,7 @@ class ContainerCompiler
      */
     private function closureToSourceCode(\Closure $c): string
     {
-        $reflector = new \ReflectionFunction($c);
-        $lines = file($reflector->getFileName());
-        $sourceCode = array_slice(
-            $lines,
-            $reflector->getStartLine(),
-            $reflector->getEndLine() - $reflector->getStartLine() - 1
-        );
-        return implode(PHP_EOL, array_map('trim', $sourceCode));
+        return \sprintf("\$f = %s\nreturn call_user_func(\$f, \$container);", $this->closureSerializer->getData($c)['code']);
     }
 
     /**

@@ -32,7 +32,7 @@ class Container implements ContainerInterface
     private $compiledContainerFile;
 
     /**
-     * @var \Zp\PHPWire\
+     * @var \Zp_PHPWire_CompiledContainer
      */
     private $compiledContainer;
 
@@ -171,7 +171,7 @@ class Container implements ContainerInterface
 
         /** @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
         /** @noinspection PhpUndefinedClassInspection */
-        $this->compiledContainer = new \Zp\PHPWire\CompiledContainer;
+        $this->compiledContainer = new \Zp_PHPWire_CompiledContainer;
     }
 
     /**

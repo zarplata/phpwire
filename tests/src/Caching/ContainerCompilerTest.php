@@ -23,9 +23,7 @@ class ContainerCompilerTest extends TestCase
         $compiler->addDefinition($definition, $container);
         // assert
         $this->assertEquals('<?php
-namespace Zp\PHPWire;
-
-class CompiledContainer
+class Zp_PHPWire_CompiledContainer
 {
 
     use \Zp\PHPWire\ContainerAwareTrait;
@@ -57,18 +55,19 @@ class CompiledContainer
         $compiler->addDefinition($definition, $container);
         // assert
         $this->assertEquals('<?php
-namespace Zp\PHPWire;
-
-class CompiledContainer
+class Zp_PHPWire_CompiledContainer
 {
 
     use \Zp\PHPWire\ContainerAwareTrait;
 
     public function create_stdClass($container)
     {
-        $instance = new \stdClass();
-        $instance->asd = \'asd\';
-        return $instance;
+        $f = function () {
+            $instance = new \stdClass();
+            $instance->asd = \'asd\';
+            return $instance;
+        };
+        return call_user_func($f, $container);
     }
 
 
@@ -93,9 +92,7 @@ class CompiledContainer
         $compiler->addDefinition($definition, $container);
         // assert
         $this->assertEquals('<?php
-namespace Zp\PHPWire;
-
-class CompiledContainer
+class Zp_PHPWire_CompiledContainer
 {
 
     use \Zp\PHPWire\ContainerAwareTrait;
@@ -122,9 +119,7 @@ class CompiledContainer
         $compiler->addDefinition($definition, $container);
         // assert
         $this->assertEquals('<?php
-namespace Zp\PHPWire;
-
-class CompiledContainer
+class Zp_PHPWire_CompiledContainer
 {
 
     use \Zp\PHPWire\ContainerAwareTrait;
@@ -154,9 +149,7 @@ class CompiledContainer
         $compiler->addDefinition($definition, $container);
         // assert
         $this->assertEquals('<?php
-namespace Zp\PHPWire;
-
-class CompiledContainer
+class Zp_PHPWire_CompiledContainer
 {
 
     use \Zp\PHPWire\ContainerAwareTrait;
@@ -188,9 +181,7 @@ class CompiledContainer
         $compiler->addDefinition($definition, $container);
         // assert
         $this->assertEquals('<?php
-namespace Zp\PHPWire;
-
-class CompiledContainer
+class Zp_PHPWire_CompiledContainer
 {
 
     use \Zp\PHPWire\ContainerAwareTrait;
@@ -224,9 +215,7 @@ class CompiledContainer
         $compiler->addDefinition($definition, $container);
         // assert
         $this->assertEquals('<?php
-namespace Zp\PHPWire;
-
-class CompiledContainer
+class Zp_PHPWire_CompiledContainer
 {
 
     use \Zp\PHPWire\ContainerAwareTrait;
@@ -260,9 +249,7 @@ class CompiledContainer
         $compiler->addDefinition($definition, $container);
         // assert
         $this->assertEquals('<?php
-namespace Zp\PHPWire;
-
-class CompiledContainer
+class Zp_PHPWire_CompiledContainer
 {
 
     use \Zp\PHPWire\ContainerAwareTrait;
@@ -272,6 +259,40 @@ class CompiledContainer
         $instance = new \Zp\PHPWire\Tests\Fixtures\ClassDependency(123);
         $instance->setFoo($container->get(\'Zp\PHPWire\Tests\Fixtures\Foo\'));
         return $instance;
+    }
+
+
+}
+', $compiler->compile());
+    }
+
+    public function testClosureDefinition()
+    {
+        // arrange
+        $compiler = new ContainerCompiler();
+        $container = $this->getMockForAbstractClass(ContainerInterface::class);
+        $container->expects($this->any())->method('has')->willReturn(true);
+
+        $definition = new Definition('\\' . ClassDependency::class, [
+            'factory' => function(ContainerInterface $c) {
+                return new ClassDependency($c->get('foo'));
+            }
+        ]);
+        // act
+        $compiler->addDefinition($definition, $container);
+        // assert
+        $this->assertEquals('<?php
+class Zp_PHPWire_CompiledContainer
+{
+
+    use \Zp\PHPWire\ContainerAwareTrait;
+
+    public function create_Zp_PHPWire_Tests_Fixtures_ClassDependency($container)
+    {
+        $f = function (\Psr\Container\ContainerInterface $c) {
+            return new \Zp\PHPWire\Tests\Fixtures\ClassDependency($c->get(\'foo\'));
+        };
+        return call_user_func($f, $container);
     }
 
 
