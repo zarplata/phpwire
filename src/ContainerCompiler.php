@@ -154,7 +154,7 @@ class ContainerCompiler
 
                 }
                 $sourceCodeLines[] = sprintf(
-                    '$instance->%s(%s)',
+                    '$instance->%s(%s);',
                     $methodName,
                     $this->argumentsToSourceCode($arguments)
                 );

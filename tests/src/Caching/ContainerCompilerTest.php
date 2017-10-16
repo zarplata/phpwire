@@ -198,7 +198,7 @@ class CompiledContainer
     public function create_Zp_PHPWire_Tests_Fixtures_MagicMethod($container)
     {
         $instance = new \Zp\PHPWire\Tests\Fixtures\MagicMethod();
-        $instance->setFoo($container->get(\'value\'))
+        $instance->setFoo($container->get(\'value\'));
         return $instance;
     }
 
@@ -234,7 +234,7 @@ class CompiledContainer
     public function create_Zp_PHPWire_Tests_Fixtures_ClassDependency($container)
     {
         $instance = new \Zp\PHPWire\Tests\Fixtures\ClassDependency(123);
-        $instance->setFoo($container->get(\'Zp\PHPWire\Tests\Fixtures\Foo\'))
+        $instance->setFoo($container->get(\'Zp\PHPWire\Tests\Fixtures\Foo\'));
         return $instance;
     }
 
