@@ -14,4 +14,4 @@ composer require zp/phpwire
 * Container compilation
 * Supporting of lazy initialization (uses [ProxyManager](https://github.com/Ocramius/ProxyManager))
 * Framework-agnostic
-* PSR-11 compliance
+* PSR-11 compliant
