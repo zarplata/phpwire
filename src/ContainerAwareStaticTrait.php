@@ -6,8 +6,6 @@ use Psr\Container\ContainerInterface;
 
 trait ContainerAwareStaticTrait
 {
-    use ContainerAwareTrait;
-
     /**
      * @var ContainerInterface
      */
