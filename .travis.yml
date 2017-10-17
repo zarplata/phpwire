@@ -1,0 +1,15 @@
+language: php
+
+php:
+- 7.1
+
+cache:
+  directories:
+  - $HOME/.composer/cache
+
+before_script:
+  - phpenv config-rm xdebug.ini
+  - composer install --no-progress
+
+script:
+  - phpunit 
