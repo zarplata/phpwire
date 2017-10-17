@@ -33,6 +33,6 @@ class ValueArgument implements ArgumentInterface
      */
     public function resolveSourceCode(): string
     {
-        return sprintf('%s', var_export($this->value, true));
+        return var_export($this->value, true);
     }
 }
