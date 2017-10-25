@@ -73,4 +73,19 @@ class ConstructorTest extends TestCase
         // assert
         $this->assertInternalType('int', $entry->getNumber());
     }
+
+    public function testScalarWithClass()
+    {
+        $container = new Container([
+            Foo::class => [],
+            ScalarDependency::class => [
+                'args' => [Foo::class]
+            ],
+        ]);
+        // act
+        /** @var ScalarDependency $entry */
+        $entry = $container->get(ScalarDependency::class);
+        // assert
+        $this->assertInternalType('string', $entry->getNumber());
+    }
 }

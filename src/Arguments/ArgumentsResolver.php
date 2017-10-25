@@ -34,7 +34,7 @@ class ArgumentsResolver
     {
         $result = [];
         foreach ($definitions as $definition) {
-            $result[] = self::parseDefinition($container, $definition);
+            $result[] = self::parseDefinition($container, $definition, true);
         }
         return $result;
     }
@@ -74,11 +74,15 @@ class ArgumentsResolver
             switch (true) {
                 // match by position
                 case array_key_exists($parameter->getPosition(), $definitions):
-                    $result[] = static::parseDefinition($container, $definitions[$parameter->getPosition()]);
+                    $result[] = static::parseDefinition(
+                        $container,
+                        $definitions[$parameter->getPosition()],
+                        (bool)$class
+                    );
                     break;
                 // match by name
                 case array_key_exists($parameter->getName(), $definitions):
-                    $result[] = static::parseDefinition($container, $definitions[$parameter->getName()]);
+                    $result[] = static::parseDefinition($container, $definitions[$parameter->getName()], (bool)$class);
                     break;
                 // autowiring
                 case $class !== null && $container->has($className):
@@ -101,11 +105,15 @@ class ArgumentsResolver
      *
      * @param ContainerInterface $container
      * @param string $definition
+     * @param bool $isClassExpected treat string as class definition in case of class expectation
      * @return ArgumentInterface
      */
-    private static function parseDefinition(ContainerInterface $container, $definition): ArgumentInterface
-    {
-        if (is_string($definition)) {
+    private static function parseDefinition(
+        ContainerInterface $container,
+        $definition,
+        bool $isClassExpected
+    ): ArgumentInterface {
+        if (is_string($definition) && $isClassExpected) {
             if ($definition[0] === '$') {
                 return new ContainerArgument(substr($definition, 1));
             }
