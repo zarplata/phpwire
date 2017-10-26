@@ -69,7 +69,6 @@ class ArgumentsResolver
         $result = [];
         foreach ($parameters as $parameter) {
             $class = $parameter->getClass();
-            $className = $class ? $class->getName() : null;
 
             switch (true) {
                 // match by position
@@ -85,8 +84,8 @@ class ArgumentsResolver
                     $result[] = static::parseDefinition($container, $definitions[$parameter->getName()], (bool)$class);
                     break;
                 // autowiring
-                case $class !== null && $container->has($className):
-                    $result[] = new ContainerArgument($className);
+                case $class !== null && $container->has($class->getName()):
+                    $result[] = new ContainerArgument($class->getName());
                     break;
                 // skip optional parameters
                 case $parameter->isOptional():
