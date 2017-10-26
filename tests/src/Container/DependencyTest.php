@@ -23,6 +23,21 @@ class DependencyTest extends TestCase
         $entry = $container->get(ClassDependency::class);
         // assert
         $this->assertInstanceOf(ClassDependency::class, $entry);
+        $this->assertNull($entry->getFoo());
+    }
+
+    public function testAliasDependency()
+    {
+        // arrange
+        $container = new Container([
+            ClassDependency::class => ['args' => ['$foo']],
+            'foo' => ['class' => Foo::class],
+        ]);
+        // act
+        $entry = $container->get(ClassDependency::class);
+        // assert
+        $this->assertInstanceOf(ClassDependency::class, $entry);
+        $this->assertInstanceOf(Foo::class, $entry->getFoo());
     }
 
     public function testInterfaceDependency()
@@ -36,6 +51,7 @@ class DependencyTest extends TestCase
         $entry = $container->get(InterfaceDependency::class);
         // assert
         $this->assertInstanceOf(InterfaceDependency::class, $entry);
+        $this->assertInstanceOf(Foo::class, $entry->getFoo());
     }
 
     /**
@@ -49,8 +65,20 @@ class DependencyTest extends TestCase
             ScalarDependency::class => [],
         ]);
         // act
-        $entry = $container->get(ScalarDependency::class);
-        // assert
-        $this->assertInstanceOf(ScalarDependency::class, $entry);
+        $container->get(ScalarDependency::class);
+    }
+
+    /**
+     * @expectedException \Psr\Container\ContainerExceptionInterface
+     * @expectedExceptionMessage Unable to create instance of entry `Zp\PHPWire\Tests\Fixtures\ClassDependency`: Unable to invoke arguments to constructor: Requested a non-existent container entry `foo`
+     */
+    public function testRequestNonExistent()
+    {
+        // arrange
+        $container = new Container([
+            ClassDependency::class => ['args' => ['$foo']],
+        ]);
+        // act
+        $container->get(ClassDependency::class);
     }
 }
