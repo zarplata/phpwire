@@ -41,6 +41,23 @@ class ConstructorTest extends TestCase
         $this->assertInstanceOf(Foo::class, $entry->getFoo());
     }
 
+    public function testAlias()
+    {
+        // arrange
+        $container = new Container([
+            'foo' => ['class' => Foo::class],
+            ClassDependency::class => [
+                'args' => ['$foo']
+            ],
+        ]);
+        // act
+        /** @var ClassDependency $entry */
+        $entry = $container->get(ClassDependency::class);
+        // assert
+        $this->assertInstanceOf(ClassDependency::class, $entry);
+        $this->assertInstanceOf(Foo::class, $entry->getFoo());
+    }
+
     public function testInterface()
     {
         // arrange
@@ -86,6 +103,19 @@ class ConstructorTest extends TestCase
         /** @var ScalarDependency $entry */
         $entry = $container->get(ScalarDependency::class);
         // assert
-        $this->assertInternalType('string', $entry->getNumber());
+        $this->assertEquals(Foo::class, $entry->getValue());
+    }
+
+    public function testScalarWithAlias()
+    {
+        $container = new Container([
+            'foo' => ['class' => Foo::class],
+            ScalarDependency::class => ['args' => ['$foo']],
+        ]);
+        // act
+        /** @var ScalarDependency $entry */
+        $entry = $container->get(ScalarDependency::class);
+        // assert
+        $this->assertEquals('$foo', $entry->getValue());
     }
 }
