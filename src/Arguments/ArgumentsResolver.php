@@ -113,7 +113,7 @@ class ArgumentsResolver
         $definition,
         bool $isClassExpected
     ): ArgumentInterface {
-        if (is_string($definition) && $isClassExpected) {
+        if ($isClassExpected && is_string($definition)) {
             if ($definition[0] === '$') {
                 return new ContainerArgument(substr($definition, 1));
             }
