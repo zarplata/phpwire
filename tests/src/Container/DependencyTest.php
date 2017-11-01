@@ -26,7 +26,7 @@ class DependencyTest extends TestCase
         $this->assertNull($entry->getFoo());
     }
 
-    public function testAliasDependency()
+    public function testNamedDependency()
     {
         // arrange
         $container = new Container([
