@@ -76,18 +76,4 @@ class ConstructorTest extends TestCase
         $this->assertInstanceOf(InterfaceDependency::class, $entry);
         $this->assertInstanceOf(Foo::class, $entry->getFoo());
     }
-
-    public function testScalar()
-    {
-        $container = new Container([
-            ScalarDependency::class => [
-                'args' => [1]
-            ],
-        ]);
-        // act
-        /** @var ScalarDependency $entry */
-        $entry = $container->get(ScalarDependency::class);
-        // assert
-        $this->assertInternalType('int', $entry->getNumber());
-    }
 }

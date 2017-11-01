@@ -52,8 +52,7 @@ class ArgumentsResolver
         ContainerInterface $container,
         array $definitions,
         \ReflectionMethod $method = null
-    ): array
-    {
+    ): array {
         $numberOfArguments = $method ? $method->getNumberOfParameters() : 0;
         if (count($definitions) > $numberOfArguments) {
             $numberOfRedundantly = count($definitions) - $numberOfArguments;
@@ -69,20 +68,23 @@ class ArgumentsResolver
         $result = [];
         foreach ($parameters as $parameter) {
             $class = $parameter->getClass();
-            $className = $class ? $class->getName() : null;
 
             switch (true) {
                 // match by position
                 case array_key_exists($parameter->getPosition(), $definitions):
-                    $result[] = static::parseDefinition($container, $definitions[$parameter->getPosition()]);
+                    $result[] = $class == null && $parameter->getType() !== null
+                        ? new ValueArgument($definitions[$parameter->getPosition()])
+                        : static::parseDefinition($container, $definitions[$parameter->getPosition()]);
                     break;
                 // match by name
                 case array_key_exists($parameter->getName(), $definitions):
-                    $result[] = static::parseDefinition($container, $definitions[$parameter->getName()]);
+                    $result[] = $class == null && $parameter->getType() !== null
+                        ? new ValueArgument($definitions[$parameter->getName()])
+                        : static::parseDefinition($container, $definitions[$parameter->getName()]);
                     break;
                 // autowiring
-                case $class !== null && $container->has($className):
-                    $result[] = new ContainerArgument($className);
+                case $class !== null && $container->has($class->getName()):
+                    $result[] = new ContainerArgument($class->getName());
                     break;
                 // skip optional parameters
                 case $parameter->isOptional():
