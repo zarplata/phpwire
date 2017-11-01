@@ -56,7 +56,7 @@ class DependencyTest extends TestCase
 
     /**
      * @expectedException \Psr\Container\ContainerExceptionInterface
-     * @expectedExceptionMessage Unable to create instance of entry `Zp\PHPWire\Tests\Fixtures\ScalarDependency`: Unable to invoke arguments to constructor: Please provide definition for argument `number`
+     * @expectedExceptionMessage Unable to create instance of entry `Zp\PHPWire\Tests\Fixtures\ScalarDependency`: Unable to invoke arguments to constructor: Please provide definition for argument `value`
      */
     public function testUnresolvedDependencies()
     {
