@@ -121,6 +121,25 @@ class Container implements ContainerInterface
     }
 
     /**
+     * Fast checking if the all services are available and dependencies can be resolved gracefully
+     * Useful for unit tests.
+     *
+     * @return ContainerException[]
+     */
+    public function validate(): array
+    {
+        $exceptions = [];
+        foreach (array_keys($this->definitions) as $alias) {
+            try {
+                $this->get($alias);
+            } catch (ContainerException $e) {
+                $exceptions[$alias] = $e;
+            }
+        }
+        return $exceptions;
+    }
+
+    /**
      * Generation of proxy classes. Useful for prepare on build.
      *
      * @throws ContainerException
