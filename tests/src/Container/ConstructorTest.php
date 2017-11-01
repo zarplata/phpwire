@@ -41,7 +41,7 @@ class ConstructorTest extends TestCase
         $this->assertInstanceOf(Foo::class, $entry->getFoo());
     }
 
-    public function testAlias()
+    public function testNamedService()
     {
         // arrange
         $container = new Container([

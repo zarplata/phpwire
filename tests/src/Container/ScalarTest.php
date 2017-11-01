@@ -56,7 +56,7 @@ class ScalarTest extends TestCase
         $this->assertInstanceOf(Foo::class, $entry->getValue());
     }
 
-    public function testMixedWithAlias()
+    public function testMixedWithNamesService()
     {
         $container = new Container([
             'foo' => [
@@ -102,7 +102,7 @@ class ScalarTest extends TestCase
         $this->assertEquals(Foo::class, $entry->getValue());
     }
 
-    public function testStringWithAlias()
+    public function testStringWithNamesService()
     {
         $container = new Container([
             'foo' => [
