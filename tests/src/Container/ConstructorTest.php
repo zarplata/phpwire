@@ -41,6 +41,23 @@ class ConstructorTest extends TestCase
         $this->assertInstanceOf(Foo::class, $entry->getFoo());
     }
 
+    public function testAlias()
+    {
+        // arrange
+        $container = new Container([
+            'foo' => ['class' => Foo::class],
+            ClassDependency::class => [
+                'args' => ['$foo']
+            ],
+        ]);
+        // act
+        /** @var ClassDependency $entry */
+        $entry = $container->get(ClassDependency::class);
+        // assert
+        $this->assertInstanceOf(ClassDependency::class, $entry);
+        $this->assertInstanceOf(Foo::class, $entry->getFoo());
+    }
+
     public function testInterface()
     {
         // arrange
