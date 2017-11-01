@@ -5,23 +5,23 @@ namespace Zp\PHPWire\Tests\Fixtures;
 class ScalarDependency
 {
     /**
-     * @var int
+     * @var mixed
      */
-    private $number;
+    private $value;
 
     /**
-     * @param $number
+     * @param $value
      */
-    public function __construct($number)
+    public function __construct($value)
     {
-        $this->number = $number;
+        $this->value = $value;
     }
 
     /**
-     * @return int
+     * @return mixed
      */
-    public function getNumber()
+    public function getValue()
     {
-        return $this->number;
+        return $this->value;
     }
 }

@@ -34,7 +34,7 @@ class ArgumentsResolver
     {
         $result = [];
         foreach ($definitions as $definition) {
-            $result[] = self::parseDefinition($container, $definition);
+            $result[] = self::parseDefinition($container, $definition, true);
         }
         return $result;
     }
@@ -68,32 +68,33 @@ class ArgumentsResolver
 
         $result = [];
         foreach ($parameters as $parameter) {
-            // match by position
-            if (array_key_exists($parameter->getPosition(), $definitions)) {
-                $result[] = static::parseDefinition($container, $definitions[$parameter->getPosition()]);
-                continue;
-            }
-            // match by name
-            if (array_key_exists($parameter->getName(), $definitions)) {
-                $result[] = static::parseDefinition($container, $definitions[$parameter->getName()]);
-                continue;
-            }
-            // autowiring
             $class = $parameter->getClass();
-            $className = $class ? $class->getName() : null;
-            if ($class !== null && $container->has($className)) {
-                $result[] = new ContainerArgument($className);
-                continue;
+
+            switch (true) {
+                // match by position
+                case array_key_exists($parameter->getPosition(), $definitions):
+                    $result[] = static::parseDefinition(
+                        $container,
+                        $definitions[$parameter->getPosition()],
+                        (bool)$class
+                    );
+                    break;
+                // match by name
+                case array_key_exists($parameter->getName(), $definitions):
+                    $result[] = static::parseDefinition($container, $definitions[$parameter->getName()], (bool)$class);
+                    break;
+                // autowiring
+                case $class !== null && $container->has($class->getName()):
+                    $result[] = new ContainerArgument($class->getName());
+                    break;
+                // skip optional parameters
+                case $parameter->isOptional():
+                    $result[] = new ValueArgument($parameter->getDefaultValue());
+                    break;
+                // hopelessness...
+                default:
+                    throw new ContainerException("Please provide definition for argument `{$parameter->name}`");
             }
-            // skip optional parameters
-            if ($parameter->isOptional()) {
-                $result[] = new ValueArgument($parameter->getDefaultValue());
-                continue;
-            }
-            // hopelessness...
-            throw new ContainerException(
-                "Please provide definition for argument `{$parameter->name}`"
-            );
         }
         return $result;
     }
@@ -103,11 +104,15 @@ class ArgumentsResolver
      *
      * @param ContainerInterface $container
      * @param string $definition
+     * @param bool $isClassExpected treat string as class definition in case of class expectation
      * @return ArgumentInterface
      */
-    private static function parseDefinition(ContainerInterface $container, $definition): ArgumentInterface
-    {
-        if (is_string($definition)) {
+    private static function parseDefinition(
+        ContainerInterface $container,
+        $definition,
+        bool $isClassExpected
+    ): ArgumentInterface {
+        if ($isClassExpected && is_string($definition)) {
             if ($definition[0] === '$') {
                 return new ContainerArgument(substr($definition, 1));
             }
