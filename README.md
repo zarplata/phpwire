@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/zarplata/phpwire.svg?branch=master)](https://travis-ci.org/zarplata/phpwire)
 
-Yet another powerful and framework-agnostic IoC Container for PHP.
+Yet another simple and powerful framework-agnostic IoC Container for PHP.
 
 ## Installation 
 
