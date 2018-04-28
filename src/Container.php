@@ -114,6 +114,7 @@ class Container implements ContainerInterface
     {
         $this->singletons = [
             'container' => $this,
+            self::class => $this,
             static::class => $this,
             ContainerInterface::class => $this,
         ];
