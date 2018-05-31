@@ -17,3 +17,7 @@ composer require zp/phpwire
 * Supporting of lazy initialization (uses [ProxyManager](https://github.com/Ocramius/ProxyManager))
 * Framework-agnostic
 * PSR-11 compliant
+
+## TODO
+
+* Add examples and update README.md
