@@ -94,7 +94,10 @@ class ContainerCompiler
      */
     private function closureToSourceCode(\Closure $c): string
     {
-        return \sprintf("\$f = %s\nreturn call_user_func(\$f, \$container);", $this->closureSerializer->getData($c)['code']);
+        return \sprintf(
+            "\$f = %s;\nreturn call_user_func(\$f, \$container);", 
+            $this->closureSerializer->getData($c)['code']
+        );
     }
 
     /**
