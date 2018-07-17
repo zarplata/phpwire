@@ -61,7 +61,7 @@ class Container implements ContainerInterface
         $this->ensureIdentifierIsString($id);
         $this->ensureIdentifierIsNotEmpty($id);
 
-        return isset($this->definitions[$id]) || array_key_exists($id, $this->singletons);
+        return isset($this->definitions[$id]) || $this->initialized($id);
     }
 
     /**
@@ -76,7 +76,7 @@ class Container implements ContainerInterface
         $this->ensureIdentifierIsString($id);
         $this->ensureIdentifierIsNotEmpty($id);
 
-        if (array_key_exists($id, $this->singletons)) {
+        if ($this->initialized($id)) {
             return $this->singletons[$id];
         }
 
@@ -104,6 +104,17 @@ class Container implements ContainerInterface
         } else {
             $this->singletons[$id] = $value;
         }
+    }
+
+    /**
+     * Returns true if the container have been initialized an entry for the given identifier.
+     *
+     * @param string $id
+     * @return bool
+     */
+    public function initialized($id): bool
+    {
+        return array_key_exists($id, $this->singletons);
     }
 
     /**
@@ -301,7 +312,7 @@ class Container implements ContainerInterface
                     ));
                     continue;
                 }
-                
+
                 throw new ContainerException(sprintf(
                     'Definition `%s` have non-existent method `%s::%s`',
                     $definition->name,
