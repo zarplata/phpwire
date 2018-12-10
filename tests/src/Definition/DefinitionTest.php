@@ -88,7 +88,7 @@ class DefinitionTest extends TestCase
         // act
         $definition = new Definition('foobar', $config);
         // assert
-        $this->assertTrue($definition->isSingleton);
+        $this->assertTrue($definition->isLazy);
     }
 
     public function testArgs()
