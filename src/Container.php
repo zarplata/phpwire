@@ -85,7 +85,7 @@ class Container implements ContainerInterface
         try {
             return $this->resolve($this->getDefinition($id));
         } catch (\Exception $e) {
-            $message = sprintf('Unable to create instance of entry `%s`: %s', $id, $e->getMessage());
+            $message = sprintf('Unable to create instance of definition `%s`', $id);
             throw new ContainerException($message, 0, $e);
         }
     }
@@ -299,7 +299,11 @@ class Container implements ContainerInterface
             );
             $instance = new $definition->className(...ArgumentsResolver::resolveArgumentsToValues($this, $arguments));
         } catch (\Exception $e) {
-            throw new ContainerException("Unable to invoke arguments to constructor: {$e->getMessage()}", 0, $e);
+            throw new ContainerException(
+                sprintf("Unable to invoke arguments to constructor of %s", $definition->className),
+                0,
+                $e
+            );
         }
 
         foreach ($definition->methods as $methodName => $methodDefinitions) {
@@ -324,7 +328,7 @@ class Container implements ContainerInterface
             $method = $reflector->getMethod($methodName);
             if ($method->isPrivate()) {
                 throw new ContainerException(sprintf(
-                    'Definition `%s` have private method `%s::%s`',
+                    'Definition `%s` have private method `%s::%s()`',
                     $definition->name,
                     $definition->className,
                     $methodName
@@ -335,7 +339,12 @@ class Container implements ContainerInterface
                 $method->invoke($instance, ...ArgumentsResolver::resolveArgumentsToValues($this, $arguments));
             } catch (\Exception $e) {
                 throw new ContainerException(
-                    sprintf('Unable to invoke arguments to method %s: %s', $methodName, $e->getMessage()),
+                    sprintf(
+                        'Unable to invoke arguments to `%s::%s()` of definition `%s`',
+                        $definition->className,
+                        $methodName,
+                        $definition->name
+                    ),
                     0,
                     $e
                 );

@@ -17,8 +17,18 @@ class ArgumentsResolver
     public static function resolveArgumentsToValues(ContainerInterface $container, array $arguments): array
     {
         $result = [];
-        foreach ($arguments as $argument) {
-            $result[] = $argument->resolve($container);
+        foreach ($arguments as $name => $argument) {
+            try {
+                $result[] = $argument->resolve($container);
+            } catch (\Throwable $e) {
+                $nameOfArgument = is_numeric($name) ? sprintf('#%s', $name) : $name;
+
+                throw new ContainerException(
+                    sprintf("Unable to resolve value of argument %s", $nameOfArgument),
+                    0,
+                    $e
+                );
+            }
         }
         return $result;
     }
