@@ -27,6 +27,9 @@ class Definition
      */
     public $className;
 
+    /** @var string */
+    public $proxyClassNameOrInterface;
+
     /**
      * @var array
      */
@@ -70,16 +73,20 @@ class Definition
 
         $this->name = \ltrim($name, '\\');
         $this->compiledMethod = 'create_' . str_replace('\\', '_', $this->name);
-        $className = class_exists($name) ? $name : null;
+        $className = class_exists($name) ? $name : '';
+        $interfaceName = interface_exists($name) ? $name : '';
+        $classNameOrInterface = $className ?: $interfaceName;
 
         if ($config instanceof \Closure) {
             $this->className = $className;
+            $this->proxyClassNameOrInterface = $classNameOrInterface;
             $this->isFactory = true;
             $this->factory = $config;
             return;
         }
 
         $this->className = \ltrim($config[self::CONFIG_CLASS] ?? $className, '\\');
+        $this->proxyClassNameOrInterface = \ltrim($config[self::CONFIG_CLASS] ?? $classNameOrInterface, '\\');
         $this->arguments = (array)($config[self::CONFIG_ARGS] ?? []);
         $this->methods = array_map(function ($args) {
             return (array)$args;

@@ -163,9 +163,11 @@ class Container implements ContainerInterface
         }
         foreach (array_keys($this->definitions) as $id) {
             $definition = $this->getDefinition($id);
-            if ($definition->isLazy) {
-                $this->proxyFactory->generateProxy($definition->className);
+            if (!$definition->isLazy) {
+                continue;
             }
+            $this->ensureDefinitionProxyIsValid($definition);
+            $this->proxyFactory->generateProxy($definition->proxyClassNameOrInterface);
         }
     }
 
@@ -255,10 +257,11 @@ class Container implements ContainerInterface
      */
     private function createProxy(Definition $definition): LazyLoadingInterface
     {
+        $this->ensureDefinitionProxyIsValid($definition);
         /** @noinspection PhpUnusedParameterInspection */
         /** @noinspection MoreThanThreeArgumentsInspection */
         return $this->proxyFactory->createProxy(
-            $definition->className,
+            $definition->proxyClassNameOrInterface,
             function (& $wrappedObject, $proxy, $method, $params, & $initializer) use ($definition) {
                 $wrappedObject = $this->createInstance($definition);
                 $initializer = null; // turning off further lazy initialization
@@ -395,6 +398,23 @@ class Container implements ContainerInterface
     {
         if (!$definition->className) {
             throw new ContainerException("Definition of entry `{$definition->name}` has empty class name");
+        }
+    }
+
+    /**
+     * @param Definition $definition
+     */
+    private function ensureDefinitionProxyIsValid(Definition $definition): void
+    {
+        if (!$definition->proxyClassNameOrInterface) {
+            throw new ContainerException(
+                "Definition of entry `{$definition->name}` has empty class name or interface"
+            );
+        }
+        if (!$definition->className && !$definition->factory) {
+            throw new ContainerException(
+                "Definition of interface entry `{$definition->name}` must have concrete class name or factory"
+            );
         }
     }
 }

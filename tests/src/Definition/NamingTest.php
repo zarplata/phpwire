@@ -19,6 +19,7 @@ class NamingTest extends TestCase
         $definition = new Definition(Foo::class, $config);
         // assert
         $this->assertEquals(Foo::class, $definition->className);
+        $this->assertEquals(Foo::class, $definition->proxyClassNameOrInterface);
     }
 
     /**
@@ -31,6 +32,7 @@ class NamingTest extends TestCase
         $definition = new Definition(FooInterface::class, $config);
         // assert
         $this->assertEmpty($definition->className);
+        $this->assertEquals(FooInterface::class, $definition->proxyClassNameOrInterface);
     }
 
     /**
@@ -43,6 +45,7 @@ class NamingTest extends TestCase
         $definition = new Definition('foobar', $config);
         // assert
         $this->assertEmpty($definition->className);
+        $this->assertEmpty($definition->proxyClassNameOrInterface);
     }
 
     public function testConfigClassNameOverrideDefinitionName()
@@ -55,6 +58,7 @@ class NamingTest extends TestCase
         $definition = new Definition(Foo::class, $config);
         // assert
         $this->assertEquals(\stdClass::class, $definition->className);
+        $this->assertEquals(\stdClass::class, $definition->proxyClassNameOrInterface);
     }
 
     /**
