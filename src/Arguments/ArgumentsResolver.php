@@ -2,7 +2,9 @@
 
 namespace Zp\PHPWire\Arguments;
 
+use Closure;
 use Psr\Container\ContainerInterface;
+use ReflectionNamedType;
 use Zp\PHPWire\ContainerException;
 
 class ArgumentsResolver
@@ -77,24 +79,32 @@ class ArgumentsResolver
 
         $result = [];
         foreach ($parameters as $parameter) {
-            $class = $parameter->getClass();
+            $type = $parameter->getType();
+            if ($type instanceof \ReflectionUnionType) {
+                throw new ContainerException("Union type does not supported in auto-wiring mode");
+            }
+            if ($type !== null && !$type instanceof ReflectionNamedType) {
+                throw new ContainerException(sprintf("Unsupported type of argument: %s", get_class($type)));
+            }
+            $isBuiltin = $type !== null && $type->isBuiltin();
+            $isClass = $type !== null && !$type->isBuiltin();
 
             switch (true) {
                 // match by position
                 case array_key_exists($parameter->getPosition(), $definitions):
-                    $result[] = $class == null && $parameter->getType() !== null
+                    $result[] = $isBuiltin
                         ? new ValueArgument($definitions[$parameter->getPosition()])
                         : static::parseDefinition($container, $definitions[$parameter->getPosition()]);
                     break;
                 // match by name
                 case array_key_exists($parameter->getName(), $definitions):
-                    $result[] = $class == null && $parameter->getType() !== null
+                    $result[] = $isBuiltin
                         ? new ValueArgument($definitions[$parameter->getName()])
                         : static::parseDefinition($container, $definitions[$parameter->getName()]);
                     break;
-                // autowiring
-                case $class !== null && $container->has($class->getName()):
-                    $result[] = new ContainerArgument($class->getName());
+                // auto-wiring
+                case $isClass && $container->has($type->getName()):
+                    $result[] = new ContainerArgument($type->getName());
                     break;
                 // skip optional parameters
                 case $parameter->isOptional():
@@ -112,7 +122,7 @@ class ArgumentsResolver
      * Parse definition to ArgumentInterface.
      *
      * @param ContainerInterface $container
-     * @param string $definition
+     * @param string|\Closure $definition
      * @return ArgumentInterface
      */
     private static function parseDefinition(ContainerInterface $container, $definition): ArgumentInterface
@@ -125,7 +135,7 @@ class ArgumentsResolver
                 return new ContainerArgument($definition);
             }
         }
-        if ($definition instanceof \Closure) {
+        if ($definition instanceof Closure) {
             return new ClosureArgument($definition);
         }
         return new ValueArgument($definition);

@@ -7,35 +7,36 @@ use Zp\PHPWire\Definition;
 
 class DefinitionTest extends TestCase
 {
-    /**
-     * @expectedException \Zp\PHPWire\ContainerException
-     * @expectedExceptionMessage Definition config must be closure or array
-     */
-    public function testConfigMustBeClosureOrArray()
+    public function testConfigMustBeClosureOrArray(): void
     {
         // arrange
         $config = null;
+
+        // assert
+        $this->expectException(\Zp\PHPWire\ContainerException::class);
+        $this->expectExceptionMessage('Definition config must be closure or array');
+
         // act
         new Definition('foobar', $config);
     }
 
-    public function testArrayAsConfig()
+    public function testArrayAsConfig(): void
     {
         // arrange
         $config = [];
         // act
         $definition = new Definition('foobar', $config);
         // assert
-        $this->assertEquals('foobar', $definition->name);
-        $this->assertCount(0, $definition->arguments);
-        $this->assertCount(0, $definition->methods);
-        $this->assertNull($definition->factory);
-        $this->assertTrue($definition->isSingleton);
-        $this->assertFalse($definition->isFactory);
-        $this->assertFalse($definition->isLazy);
+        self::assertEquals('foobar', $definition->name);
+        self::assertCount(0, $definition->arguments);
+        self::assertCount(0, $definition->methods);
+        self::assertNull($definition->factory);
+        self::assertTrue($definition->isSingleton);
+        self::assertFalse($definition->isFactory);
+        self::assertFalse($definition->isLazy);
     }
 
-    public function testClosureAsConfig()
+    public function testClosureAsConfig(): void
     {
         // arrange
         $config = function () {
@@ -43,31 +44,31 @@ class DefinitionTest extends TestCase
         // act
         $definition = new Definition('foobar', $config);
         // assert
-        $this->assertEquals('foobar', $definition->name);
-        $this->assertCount(0, $definition->arguments);
-        $this->assertCount(0, $definition->methods);
-        $this->assertSame($config, $definition->factory);
-        $this->assertTrue($definition->isSingleton);
-        $this->assertTrue($definition->isFactory);
-        $this->assertFalse($definition->isLazy);
+        self::assertEquals('foobar', $definition->name);
+        self::assertCount(0, $definition->arguments);
+        self::assertCount(0, $definition->methods);
+        self::assertSame($config, $definition->factory);
+        self::assertTrue($definition->isSingleton);
+        self::assertTrue($definition->isFactory);
+        self::assertFalse($definition->isLazy);
     }
 
-    public function testEmptyConfig()
+    public function testEmptyConfig(): void
     {
         // arrange
         $config = [];
         // act
         $definition = new Definition('foobar', $config);
         // assert
-        $this->assertCount(0, $definition->arguments);
-        $this->assertCount(0, $definition->methods);
-        $this->assertNull($definition->factory);
-        $this->assertTrue($definition->isSingleton);
-        $this->assertFalse($definition->isFactory);
-        $this->assertFalse($definition->isLazy);
+        self::assertCount(0, $definition->arguments);
+        self::assertCount(0, $definition->methods);
+        self::assertNull($definition->factory);
+        self::assertTrue($definition->isSingleton);
+        self::assertFalse($definition->isFactory);
+        self::assertFalse($definition->isLazy);
     }
 
-    public function testSingleton()
+    public function testSingleton(): void
     {
         // arrange
         $config = [
@@ -76,10 +77,10 @@ class DefinitionTest extends TestCase
         // act
         $definition = new Definition('foobar', $config);
         // assert
-        $this->assertFalse($definition->isSingleton);
+        self::assertFalse($definition->isSingleton);
     }
 
-    public function testLazy()
+    public function testLazy(): void
     {
         // arrange
         $config = [
@@ -88,10 +89,10 @@ class DefinitionTest extends TestCase
         // act
         $definition = new Definition('foobar', $config);
         // assert
-        $this->assertTrue($definition->isLazy);
+        self::assertTrue($definition->isLazy);
     }
 
-    public function testArgs()
+    public function testArgs(): void
     {
         // arrange
         $config = [
@@ -100,11 +101,11 @@ class DefinitionTest extends TestCase
         // act
         $definition = new Definition('foobar', $config);
         // assert
-        $this->assertCount(2, $definition->arguments);
-        $this->assertEquals([true, \stdClass::class], $definition->arguments);
+        self::assertCount(2, $definition->arguments);
+        self::assertEquals([true, \stdClass::class], $definition->arguments);
     }
 
-    public function testMethods()
+    public function testMethods(): void
     {
         // arrange
         $config = [
@@ -115,8 +116,8 @@ class DefinitionTest extends TestCase
         // act
         $definition = new Definition('foobar', $config);
         // assert
-        $this->assertCount(1, $definition->methods);
-        $this->assertArrayHasKey('someMethod', $definition->methods);
-        $this->assertEquals([true, 'arg' => \stdClass::class], $definition->methods['someMethod']);
+        self::assertCount(1, $definition->methods);
+        self::assertArrayHasKey('someMethod', $definition->methods);
+        self::assertEquals([true, 'arg' => \stdClass::class], $definition->methods['someMethod']);
     }
 }

@@ -2,13 +2,14 @@
 
 namespace Zp\PHPWire\Tests\Caching;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Zp\PHPWire\Container;
 use Zp\PHPWire\Tests\Fixtures\Foo;
 
 class ContainerTest extends TestCase
 {
-    public function testGenerateCacheFile()
+    public function testGenerateCacheFile(): void
     {
         // arrange
         $cacheFile = sys_get_temp_dir() . '/' . uniqid('container-', true);
@@ -19,24 +20,26 @@ class ContainerTest extends TestCase
         // act
         $container->compileContainer();
         // assert
-        $this->assertStringEqualsFile($cacheFile, '<?php
-class Zp_PHPWire_CompiledContainer
-{
-
-    use \Zp\PHPWire\ContainerAwareTrait;
-
-    public function create_Zp_PHPWire_Tests_Fixtures_Foo($container)
-    {
-        $instance = new \Zp\PHPWire\Tests\Fixtures\Foo();
-        return $instance;
+        self::assertStringEqualsFile(
+            $cacheFile,
+            <<<'PHP'
+                <?php
+                class Zp_PHPWire_CompiledContainer
+                {
+                    use \Zp\PHPWire\ContainerAwareTrait;
+                
+                    public function create_Zp_PHPWire_Tests_Fixtures_Foo($container)
+                    {
+                        $instance = new \Zp\PHPWire\Tests\Fixtures\Foo();
+                        return $instance;
+                    }
+                }
+                
+                PHP
+        );
     }
 
-
-}
-');
-    }
-
-    public function testUsingCacheFile()
+    public function testUsingCacheFile(): void
     {
         // arrange
         $definitions = [
@@ -59,7 +62,7 @@ class Zp_PHPWire_CompiledContainer
         $this->assertInstanceOf(Foo::class, $foo);
     }
 
-    private function injectCompiledContainerMock(Container $container, \PHPUnit_Framework_MockObject_MockObject $mock)
+    private function injectCompiledContainerMock(Container $container, MockObject $mock): void
     {
         $method = new \ReflectionProperty(Container::class, 'compiledContainer');
         $method->setAccessible(true);

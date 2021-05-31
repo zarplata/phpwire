@@ -175,7 +175,6 @@ class Container implements ContainerInterface
      * Generate the  for definitions.
      *
      * @throws ContainerException
-     * @throws \Zend\Code\Generator\Exception\InvalidArgumentException
      * @throws \ReflectionException
      */
     public function compileContainer(): void

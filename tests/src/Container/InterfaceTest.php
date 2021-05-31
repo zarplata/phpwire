@@ -7,7 +7,7 @@ use Zp\PHPWire\Container;
 
 class InterfaceTest extends TestCase
 {
-    public function testHas()
+    public function testHas(): void
     {
         // assert
         $definitions = [
@@ -26,7 +26,7 @@ class InterfaceTest extends TestCase
         $this->assertFalse($container->has('dummy'));
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         // arrange
         $definitions = [
@@ -44,7 +44,7 @@ class InterfaceTest extends TestCase
         $this->assertSame('baz', $container->get('bar'));
     }
 
-    public function testGetDoesMemoizeByDefaultInsteadOfPSR4()
+    public function testGetDoesMemoizeByDefaultInsteadOfPSR4(): void
     {
         // arrange
         $i = 0;
@@ -62,7 +62,7 @@ class InterfaceTest extends TestCase
         $this->assertSame(1, $i);
     }
 
-    public function testGetDoesNotMemoize()
+    public function testGetDoesNotMemoize(): void
     {
         // arrange
         $i = 0;
@@ -83,12 +83,9 @@ class InterfaceTest extends TestCase
         $this->assertSame(2, $i);
     }
 
-    /**
-     * @expectedException \Psr\Container\NotFoundExceptionInterface
-     * @expectedExceptionMessage Requested a non-existent container entry `dummy`
-     */
-    public function testGetThrowsOnUndefinedEntry()
+    public function testGetThrowsOnUndefinedEntry(): void
     {
+        // arrange
         $container = new Container([
             'foo' => function () {
                 return 'bar';
@@ -97,6 +94,12 @@ class InterfaceTest extends TestCase
                 return 'baz';
             },
         ]);
+
+        // assert
+        $this->expectExceptionMessage("Requested a non-existent container entry `dummy`");
+        $this->expectException(\Psr\Container\NotFoundExceptionInterface::class);
+
+        // act
         $container->get('dummy');
     }
 }

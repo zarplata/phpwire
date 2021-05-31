@@ -16,14 +16,14 @@ class LazyProxyTest extends TestCase
 {
     private $tmpDir;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         /** @noinspection NonSecureUniqidUsageInspection */
         $this->tmpDir = sys_get_temp_dir() . '/' . uniqid('lazy-proxy-');
         mkdir($this->tmpDir);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $it = new RecursiveDirectoryIterator($this->tmpDir, RecursiveDirectoryIterator::SKIP_DOTS);
         $files = new RecursiveIteratorIterator($it, RecursiveIteratorIterator::CHILD_FIRST);

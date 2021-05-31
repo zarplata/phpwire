@@ -2,11 +2,11 @@
 
 namespace Zp\PHPWire;
 
+use Laminas\Code\Generator\ClassGenerator;
+use Laminas\Code\Generator\MethodGenerator;
+use Laminas\EventManager\Exception\InvalidArgumentException;
 use Psr\Container\ContainerInterface;
 use SuperClosure\Serializer;
-use Zend\Code\Generator\ClassGenerator;
-use Zend\Code\Generator\Exception\InvalidArgumentException;
-use Zend\Code\Generator\MethodGenerator;
 use Zp\PHPWire\Arguments\ArgumentInterface;
 use Zp\PHPWire\Arguments\ArgumentsResolver;
 
@@ -24,9 +24,11 @@ class ContainerCompiler
 
     public function __construct()
     {
-        $this->classGenerator = (new ClassGenerator)
+        $this->classGenerator = new ClassGenerator();
+        $this->classGenerator
             ->setName('Zp_PHPWire_CompiledContainer')
             ->addTrait('\\' . ContainerAwareTrait::class);
+
         $this->closureSerializer = new Serializer();
     }
 
@@ -94,9 +96,11 @@ class ContainerCompiler
      */
     private function closureToSourceCode(\Closure $c): string
     {
+        /** @var array $data */
+        $data = $this->closureSerializer->getData($c);
         return \sprintf(
-            "\$f = %s;\nreturn call_user_func(\$f, \$container);", 
-            $this->closureSerializer->getData($c)['code']
+            "\$f = %s;\nreturn call_user_func(\$f, \$container);",
+            $data['code']
         );
     }
 

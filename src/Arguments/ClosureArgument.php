@@ -35,6 +35,8 @@ class ClosureArgument implements ArgumentInterface
     public function resolveSourceCode(): string
     {
         $serializer = new Serializer();
-        return sprintf('call_user_func(%s, $container)', rtrim($serializer->getData($this->closure)['code'], ';'));
+        /** @var array $data */
+        $data = $serializer->getData($this->closure);
+        return sprintf('call_user_func(%s, $container)', rtrim($data['code'], ';'));
     }
 }
