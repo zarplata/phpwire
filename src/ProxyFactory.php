@@ -2,6 +2,7 @@
 
 namespace Zp\PHPWire;
 
+use Closure;
 use ProxyManager\Configuration;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\FileLocator\FileLocator;
@@ -37,7 +38,7 @@ class ProxyFactory
      *
      * @return LazyLoadingInterface
      */
-    public function createProxy(string $className, \Closure $initializer): LazyLoadingInterface
+    public function createProxy(string $className, Closure $initializer): LazyLoadingInterface
     {
         $this->createProxyManager();
         return $this->proxyManager->createProxy($className, $initializer);
@@ -50,7 +51,8 @@ class ProxyFactory
     public function generateProxy(string $className): void
     {
         $this->createProxyManager();
-        $this->proxyManager->createProxy($className, function () {
+        $this->proxyManager->createProxy($className, static function () {
+            // do nothing here
         });
     }
 
