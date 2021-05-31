@@ -4,6 +4,7 @@ namespace Zp\PHPWire\Tests\Caching;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use stdClass;
 use Zp\PHPWire\ContainerCompiler;
 use Zp\PHPWire\Definition;
 use Zp\PHPWire\Tests\Fixtures\ClassDependency;
@@ -13,16 +14,16 @@ use Zp\PHPWire\Tests\Fixtures\ScalarDependency;
 
 class ContainerCompilerTest extends TestCase
 {
-    public function testStdClass()
+    public function testStdClass(): void
     {
         // arrange
         $compiler = new ContainerCompiler();
         $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
-        $definition = new Definition(\stdClass::class, []);
+        $definition = new Definition(stdClass::class, []);
         // act
         $compiler->addDefinition($definition, $container);
         // assert
-        $this->assertEquals(
+        self::assertEquals(
             <<<'PHP'
                 <?php
                 class Zp_PHPWire_CompiledContainer
@@ -41,24 +42,24 @@ class ContainerCompilerTest extends TestCase
         );
     }
 
-    public function testFactory()
+    public function testFactory(): void
     {
         // arrange
         $compiler = new ContainerCompiler();
         $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
         $definition = new Definition(
-            \stdClass::class, [
-                                'factory' => function () {
-                                    $instance = new \stdClass();
-                                    $instance->asd = 'asd';
-                                    return $instance;
-                                }
-                            ]
+            stdClass::class, [
+                               'factory' => function () {
+                                   $instance = new stdClass();
+                                   $instance->asd = 'asd';
+                                   return $instance;
+                               }
+                           ]
         );
         // act
         $compiler->addDefinition($definition, $container);
         // assert
-        $this->assertEquals(
+        self::assertEquals(
             <<<'PHP'
                 <?php
                 class Zp_PHPWire_CompiledContainer
@@ -81,19 +82,22 @@ class ContainerCompilerTest extends TestCase
         );
     }
 
-    public function testCtorClosureArgument()
+    public function testCtorClosureArgument(): void
     {
         // arrange
         $compiler = new ContainerCompiler();
         $container = $this->getMockForAbstractClass(ContainerInterface::class);
         $container->method('has')->willReturn(true);
-        $definition = new Definition(ClassDependency::class, [
-            'args' => [
-                'foo' => function (ContainerInterface $c) {
-                    return new Foo();
-                }
+        $definition = new Definition(
+            ClassDependency::class,
+            [
+                'args' => [
+                    'foo' => function (ContainerInterface $c) {
+                        return new Foo();
+                    }
+                ]
             ]
-        ]);
+        );
         // act
         $compiler->addDefinition($definition, $container);
         // assert
@@ -118,17 +122,17 @@ class ContainerCompilerTest extends TestCase
         );
     }
 
-    public function testCtorContainerArgument()
+    public function testCtorContainerArgument(): void
     {
         // arrange
         $compiler = new ContainerCompiler();
         $container = $this->getMockForAbstractClass(ContainerInterface::class);
-        $container->expects($this->any())->method('has')->willReturn(true);
+        $container->method('has')->willReturn(true);
         $definition = new Definition(ClassDependency::class, []);
         // act
         $compiler->addDefinition($definition, $container);
         // assert
-        $this->assertEquals(
+        self::assertEquals(
             <<<'PHP'
                 <?php
                 class Zp_PHPWire_CompiledContainer
@@ -155,9 +159,10 @@ class ContainerCompilerTest extends TestCase
         $container->method('has')->willReturn(true);
 
         $definition = new Definition(
-            ScalarDependency::class, [
-                                       'args' => [123]
-                                   ]
+            ScalarDependency::class,
+            [
+                'args' => [123]
+            ]
         );
         // act
         $compiler->addDefinition($definition, $container);
@@ -186,19 +191,20 @@ class ContainerCompilerTest extends TestCase
         // arrange
         $compiler = new ContainerCompiler();
         $container = $this->getMockForAbstractClass(ContainerInterface::class);
-        $container->expects($this->any())->method('has')->willReturn(true);
+        $container->method('has')->willReturn(true);
 
         $definition = new Definition(
-            MagicMethod::class, [
-                                  'methods' => [
-                                      'setFoo' => ['value']
-                                  ],
-                              ]
+            MagicMethod::class,
+            [
+                'methods' => [
+                    'setFoo' => ['value']
+                ],
+            ]
         );
         // act
         $compiler->addDefinition($definition, $container);
         // assert
-        $this->assertEquals(
+        self::assertEquals(
             <<<'PHP'
                 <?php
                 class Zp_PHPWire_CompiledContainer
@@ -223,20 +229,21 @@ class ContainerCompilerTest extends TestCase
         // arrange
         $compiler = new ContainerCompiler();
         $container = $this->getMockForAbstractClass(ContainerInterface::class);
-        $container->expects($this->any())->method('has')->willReturn(true);
+        $container->method('has')->willReturn(true);
 
         $definition = new Definition(
-            ClassDependency::class, [
-                                      'args' => [123],
-                                      'methods' => [
-                                          'setFoo' => null
-                                      ],
-                                  ]
+            ClassDependency::class,
+            [
+                'args' => [123],
+                'methods' => [
+                    'setFoo' => null
+                ],
+            ]
         );
         // act
         $compiler->addDefinition($definition, $container);
         // assert
-        $this->assertEquals(
+        self::assertEquals(
             <<<'PHP'
                 <?php
                 class Zp_PHPWire_CompiledContainer
@@ -256,25 +263,26 @@ class ContainerCompilerTest extends TestCase
         );
     }
 
-    public function testClassNameTrailingSlash()
+    public function testClassNameTrailingSlash(): void
     {
         // arrange
         $compiler = new ContainerCompiler();
         $container = $this->getMockForAbstractClass(ContainerInterface::class);
-        $container->expects($this->any())->method('has')->willReturn(true);
+        $container->method('has')->willReturn(true);
 
         $definition = new Definition(
-            '\\' . ClassDependency::class, [
-                                             'args' => [123],
-                                             'methods' => [
-                                                 'setFoo' => null
-                                             ],
-                                         ]
+            '\\' . ClassDependency::class,
+            [
+                'args' => [123],
+                'methods' => [
+                    'setFoo' => null
+                ],
+            ]
         );
         // act
         $compiler->addDefinition($definition, $container);
         // assert
-        $this->assertEquals(
+        self::assertEquals(
             <<<'PHP'
                 <?php
                 class Zp_PHPWire_CompiledContainer
@@ -294,24 +302,25 @@ class ContainerCompilerTest extends TestCase
         );
     }
 
-    public function testClosureDefinition()
+    public function testClosureDefinition(): void
     {
         // arrange
         $compiler = new ContainerCompiler();
         $container = $this->getMockForAbstractClass(ContainerInterface::class);
-        $container->expects($this->any())->method('has')->willReturn(true);
+        $container->method('has')->willReturn(true);
 
         $definition = new Definition(
-            '\\' . ClassDependency::class, [
-                                             'factory' => function (ContainerInterface $c) {
-                                                 return new ClassDependency($c->get('foo'));
-                                             }
-                                         ]
+            '\\' . ClassDependency::class,
+            [
+                'factory' => function (ContainerInterface $c) {
+                    return new ClassDependency($c->get('foo'));
+                }
+            ]
         );
         // act
         $compiler->addDefinition($definition, $container);
         // assert
-        $this->assertEquals(
+        self::assertEquals(
             <<<'PHP'
                 <?php
                 class Zp_PHPWire_CompiledContainer
