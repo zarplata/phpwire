@@ -48,19 +48,21 @@ class ContainerCompilerTest extends TestCase
         $compiler = new ContainerCompiler();
         $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
         $definition = new Definition(
-            stdClass::class, [
-                               'factory' => function () {
-                                   $instance = new stdClass();
-                                   $instance->asd = 'asd';
-                                   return $instance;
-                               }
-                           ]
+            stdClass::class,
+            [
+                'factory' => function () {
+$instance = new stdClass();
+$instance->asd = 'asd';
+return $instance;
+                }
+            ]
         );
         // act
         $compiler->addDefinition($definition, $container);
+        $compiled = $compiler->compile();
+
         // assert
-        self::assertEquals(
-            <<<'PHP'
+        $expected = <<<'PHP'
                 <?php
                 class Zp_PHPWire_CompiledContainer
                 {
@@ -68,18 +70,16 @@ class ContainerCompilerTest extends TestCase
                 
                     public function create_stdClass($container)
                     {
-                        $f = function () {
-                            $instance = new \stdClass();
-                            $instance->asd = 'asd';
-                            return $instance;
-                        };
-                        return call_user_func($f, $container);
+                        $f = unserialize(base64_decode(
+                            'BASE64-HERE'
+                        ));
+                        return $f($container);
                     }
                 }
                 
-                PHP,
-            $compiler->compile()
-        );
+                PHP;
+
+        self::assertEquals($expected, preg_replace('#\'(\\w+)\'#i', '\'BASE64-HERE\'', $compiled), $compiled);
     }
 
     public function testCtorClosureArgument(): void
@@ -319,9 +319,10 @@ class ContainerCompilerTest extends TestCase
         );
         // act
         $compiler->addDefinition($definition, $container);
+        $compiled = $compiler->compile();
+
         // assert
-        self::assertEquals(
-            <<<'PHP'
+        $expected = <<<'PHP'
                 <?php
                 class Zp_PHPWire_CompiledContainer
                 {
@@ -329,15 +330,60 @@ class ContainerCompilerTest extends TestCase
                 
                     public function create_Zp_PHPWire_Tests_Fixtures_ClassDependency($container)
                     {
-                        $f = function (\Psr\Container\ContainerInterface $c) {
-                            return new \Zp\PHPWire\Tests\Fixtures\ClassDependency($c->get('foo'));
-                        };
-                        return call_user_func($f, $container);
+                        $f = unserialize(base64_decode(
+                            'BASE64-HERE'
+                        ));
+                        return $f($container);
                     }
                 }
                 
-                PHP,
-            $compiler->compile()
+                PHP;
+
+        self::assertEquals($expected, preg_replace('#\'([a-zA-Z0-9=+]+)\'#i', '\'BASE64-HERE\'', $compiled), $compiled);
+    }
+
+    public function testEvaluate(): void
+    {
+        // arrange
+        $container = $this->getMockForAbstractClass(ContainerInterface::class);
+        $container->method('has')->willReturn(true);
+
+        $compiler = new ContainerCompiler();
+        $compiler->addDefinition(
+            new Definition(
+                '\\' . ClassDependency::class,
+                [
+                    'factory' => function (ContainerInterface $c) {
+                        return new ClassDependency($c->get('foo'));
+                    }
+                ]
+            ),
+            $container
         );
+        $compiler->addDefinition(
+            new Definition(
+                stdClass::class,
+                [
+                    'factory' => function () {
+                        $instance = new stdClass();
+                        $instance->asd = 'asd';
+                        return $instance;
+                    }
+                ]
+            ),
+            $container
+        );
+
+        // act
+        $compiled = $compiler->compile();
+        eval(str_replace('<?php', '', $compiled));
+        $compiled = new \Zp_PHPWire_CompiledContainer();
+
+        $dep1 = $compiled->create_Zp_PHPWire_Tests_Fixtures_ClassDependency($container);
+        $dep2 = $compiled->create_stdClass($container);
+
+        // assert
+        self::assertInstanceOf(ClassDependency::class, $dep1);
+        self::assertInstanceOf(stdClass::class, $dep2);
     }
 }

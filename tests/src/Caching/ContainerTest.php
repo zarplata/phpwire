@@ -47,8 +47,8 @@ class ContainerTest extends TestCase
         ];
         $container = new Container($definitions, null);
 
-        $mock = $this->getMockBuilder('Zp\PHPWire\CompiledContainer')
-            ->setMethods(['create_Zp_PHPWire_Tests_Fixtures_Foo'])
+        $mock = $this->getMockBuilder('Zp_PHPWire_CompiledContainer')
+            ->addMethods(['create_Zp_PHPWire_Tests_Fixtures_Foo'])
             ->getMock();
         $mock->expects($this->once())
             ->method('create_Zp_PHPWire_Tests_Fixtures_Foo')
