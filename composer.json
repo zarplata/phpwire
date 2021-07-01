@@ -27,5 +27,8 @@
     "psr-4": {
       "Zp\\PHPWire\\Tests\\": "tests/src"
     }
+  },
+  "provide": {
+    "psr/container-implementation": "1.0"
   }
 }
