@@ -5,17 +5,17 @@ namespace Zp\PHPWire;
 use ProxyManager\Exception\FileNotWritableException;
 use ProxyManager\FileLocator\FileLocatorInterface;
 use ProxyManager\GeneratorStrategy\GeneratorStrategyInterface;
-use Zend\Code\Generator\ClassGenerator;
+use Laminas\Code\Generator\ClassGenerator;
 
 class ProxyFileWriterGeneratorStrategy implements GeneratorStrategyInterface
 {
     /**
-     * @var \ProxyManager\FileLocator\FileLocatorInterface
+     * @var FileLocatorInterface
      */
     private $fileLocator;
 
     /**
-     * @param \ProxyManager\FileLocator\FileLocatorInterface $fileLocator
+     * @param FileLocatorInterface $fileLocator
      */
     public function __construct(FileLocatorInterface $fileLocator)
     {
