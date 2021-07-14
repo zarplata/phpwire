@@ -342,6 +342,47 @@ return $instance;
         self::assertEquals($expected, preg_replace('#\'([a-zA-Z0-9=+]+)\'#i', '\'BASE64-HERE\'', $compiled), $compiled);
     }
 
+    public function testClosureArgument(): void
+    {
+        // arrange
+        $compiler = new ContainerCompiler();
+        $container = $this->getMockForAbstractClass(ContainerInterface::class);
+        $container->method('has')->willReturn(true);
+
+        $definition = new Definition(
+            '\\' . ClassDependency::class,
+            [
+                'args' => [
+                    'foo' => function (ContainerInterface $c) {
+                        return $c->get('foo');
+                    },
+                ]
+            ]
+        );
+        // act
+        $compiler->addDefinition($definition, $container);
+        $compiled = $compiler->compile();
+
+        // assert
+        $expected = <<<'PHP'
+                <?php
+                class Zp_PHPWire_CompiledContainer
+                {
+                    use \Zp\PHPWire\ContainerAwareTrait;
+                
+                    public function create_Zp_PHPWire_Tests_Fixtures_ClassDependency($container)
+                    {
+                        $instance = new \Zp\PHPWire\Tests\Fixtures\ClassDependency(call_user_func(unserialize(base64_decode('BASE64-HERE')), $container));
+                        return $instance;
+                    }
+                }
+                
+                PHP;
+
+        self::assertEquals($expected, preg_replace('#\'([a-zA-Z0-9=+]+)\'#i', '\'BASE64-HERE\'', $compiled), $compiled);
+    }
+
+
     public function testEvaluate(): void
     {
         // arrange

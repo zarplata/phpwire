@@ -4,6 +4,7 @@ namespace Zp\PHPWire\Arguments;
 
 use Psr\Container\ContainerInterface;
 use SuperClosure\Serializer;
+use Zp\PHPWire\ContainerCompiler;
 
 class ClosureArgument implements ArgumentInterface
 {
@@ -34,9 +35,7 @@ class ClosureArgument implements ArgumentInterface
      */
     public function resolveSourceCode(): string
     {
-        $serializer = new Serializer();
-        /** @var array $data */
-        $data = $serializer->getData($this->closure);
-        return sprintf('call_user_func(%s, $container)', rtrim($data['code'], ';'));
+        $s = ContainerCompiler::serializeClosure($this->closure);
+        return sprintf('call_user_func(%s, $container)', $s);
     }
 }

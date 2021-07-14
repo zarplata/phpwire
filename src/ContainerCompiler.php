@@ -25,6 +25,14 @@ class ContainerCompiler
             ->addTrait('\\' . ContainerAwareTrait::class);
     }
 
+    public static function serializeClosure(\Closure $c): string
+    {
+        return sprintf(
+            'unserialize(base64_decode(\'%s\'))',
+            base64_encode(serialize(SerializableClosure::from($c)))
+        );
+    }
+
     /**
      * Add definition
      *
@@ -90,12 +98,10 @@ class ContainerCompiler
     private function closureToSourceCode(\Closure $c): string
     {
         $code = <<<'CODE'
-        $f = unserialize(base64_decode(
-            '%s'
-        ));
+        $f = %s;
         return $f($container);
         CODE;
-        return \sprintf($code, base64_encode(serialize(SerializableClosure::from($c))));
+        return \sprintf($code, self::serializeClosure($c));
     }
 
     /**
